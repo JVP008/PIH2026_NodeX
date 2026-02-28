@@ -15,8 +15,9 @@ function PostJobContent() {
 
     useEffect(() => {
         const checkAuth = async () => {
+            const isGuest = typeof window !== 'undefined' && localStorage.getItem('isGuest') === 'true';
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            if (!user && !isGuest) {
                 router.push('/login');
             }
         };

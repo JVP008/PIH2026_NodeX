@@ -9,6 +9,7 @@ export default function NavBar() {
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
+    const [isGuest, setIsGuest] = useState(false);
 
     useEffect(() => {
         const getUser = async () => {
@@ -17,8 +18,14 @@ export default function NavBar() {
         };
         getUser();
 
+        // Check guest mode
+        if (typeof window !== 'undefined') {
+            setIsGuest(localStorage.getItem('isGuest') === 'true');
+        }
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            if (session?.user) setIsGuest(false); // clear guest if real user logs in
         });
 
         return () => subscription.unsubscribe();
@@ -26,6 +33,12 @@ export default function NavBar() {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        router.push('/login');
+    };
+
+    const handleExitGuest = () => {
+        localStorage.removeItem('isGuest');
+        setIsGuest(false);
         router.push('/login');
     };
 
@@ -58,6 +71,15 @@ export default function NavBar() {
                                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                                     <i className="fas fa-user"></i>
                                 </div>
+                            </>
+                        ) : isGuest ? (
+                            <>
+                                <span className="text-sm flex items-center gap-1">
+                                    <i className="fas fa-user-secret"></i> Guest
+                                </span>
+                                <button onClick={handleExitGuest} className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition">
+                                    Sign In
+                                </button>
                             </>
                         ) : (
                             <Link href="/login" className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
