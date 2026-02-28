@@ -1,5 +1,37 @@
 import Link from 'next/link';
 
+const SOCIALS = [
+    {
+        label: 'X / Twitter',
+        href: 'https://twitter.com',
+        hoverClass: 'hover:border-black hover:text-black hover:bg-black hover:text-white',
+        icon: (
+            // Inline SVG — Font Awesome's fa-x-twitter only works on newer CDN versions
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Facebook',
+        href: 'https://facebook.com',
+        hoverClass: 'hover:border-blue-600 hover:text-blue-600',
+        icon: <i className="fab fa-facebook-f text-sm"></i>,
+    },
+    {
+        label: 'Instagram',
+        href: 'https://instagram.com',
+        hoverClass: 'hover:border-pink-500 hover:text-pink-500',
+        icon: <i className="fab fa-instagram text-sm"></i>,
+    },
+    {
+        label: 'LinkedIn',
+        href: 'https://linkedin.com',
+        hoverClass: 'hover:border-blue-700 hover:text-blue-700',
+        icon: <i className="fab fa-linkedin-in text-sm"></i>,
+    },
+];
+
 export default function Footer() {
     return (
         <footer className="bg-white border-t border-gray-200 mt-20">
@@ -18,18 +50,18 @@ export default function Footer() {
                             India&apos;s trusted platform connecting homeowners with verified local professionals across 50+ cities.
                         </p>
                         <div className="flex items-center gap-3">
-                            <a href="#" aria-label="X / Twitter" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-black hover:text-black transition">
-                                <i className="fab fa-x-twitter text-sm"></i>
-                            </a>
-                            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition">
-                                <i className="fab fa-facebook-f text-sm"></i>
-                            </a>
-                            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-pink-500 hover:text-pink-500 transition">
-                                <i className="fab fa-instagram text-sm"></i>
-                            </a>
-                            <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-700 hover:text-blue-700 transition">
-                                <i className="fab fa-linkedin-in text-sm"></i>
-                            </a>
+                            {SOCIALS.map(({ label, href, hoverClass, icon }) => (
+                                <a
+                                    key={label}
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={label}
+                                    className={`w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 transition-all duration-200 ${hoverClass}`}
+                                >
+                                    {icon}
+                                </a>
+                            ))}
                         </div>
                     </div>
 
