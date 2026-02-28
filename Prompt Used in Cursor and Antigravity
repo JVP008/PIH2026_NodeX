@@ -1,0 +1,186 @@
+# Prompt Used in Antigravity:
+You are a Senior Full-Stack Engineer.
+
+We are building a production-ready web application step-by-step for a hackathon. 
+DO NOT generate the full application at once because you get Hallucinated.
+
+Follow STRICT incremental development.
+
+----------------------------------------
+
+# PROJECT OVERVIEW
+Build a web platform called "HouseConnect" where users can:
+- Post jobs for home services (plumbing, cleaning, electrical, etc.)
+- View and browse contractors
+- Book services with contractors
+- Manage bookings
+- Submit disputes/support requests
+
+Tech Stack:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Supabase (Auth + Database)
+
+----------------------------------------
+
+# DEVELOPMENT RULES (CRITICAL)
+- Generate code ONLY for the current step
+- Do NOT jump ahead
+- Do NOT create unnecessary files
+- Keep code clean and production-ready
+- Use proper folder structure
+- Use reusable components
+- Ensure everything compiles
+- Explain briefly what was done
+
+----------------------------------------
+
+# DATABASE (Supabase Tables)
+We will use these tables:
+
+users:
+- id (uuid)
+- name
+- email
+- created_at
+
+contractors:
+- id
+- name
+- service
+- rating
+- reviews
+- price
+- location
+- verified
+- created_at
+
+jobs:
+- id
+- user_id
+- category
+- description
+- location
+- budget_min
+- budget_max
+- created_at
+
+bookings:
+- id
+- user_id
+- contractor_id
+- date
+- time
+- status
+- price
+- created_at
+
+disputes:
+- id
+- user_id
+- booking_id
+- type
+- description
+- status
+- created_at
+
+----------------------------------------
+
+# STEP-BY-STEP EXECUTION
+
+## STEP 1 — Project Setup
+- Initialize Next.js app with TypeScript
+- Setup Tailwind CSS
+- Create basic folder structure
+- Create layout and homepage
+
+WAIT for confirmation before next step.
+
+----------------------------------------
+
+## STEP 2 — Supabase Setup
+- Setup Supabase client
+- Configure environment variables
+- Create utility file for client
+- Test connection
+
+WAIT for confirmation.
+
+----------------------------------------
+
+## STEP 3 — Authentication
+- Implement login/signup using Supabase
+- Add basic auth UI
+- Handle session state
+
+WAIT for confirmation.
+
+----------------------------------------
+
+## STEP 4 — Core UI Layout
+- Navbar with navigation:
+  Home, Post Job, Find Pros, Bookings, Support
+- Hero section
+- Basic page routing
+
+WAIT.
+
+----------------------------------------
+
+## STEP 5 — Contractors Page
+- Fetch contractors from Supabase
+- Display cards
+- Add basic filters
+
+WAIT.
+
+----------------------------------------
+
+## STEP 6 — Job Posting
+- Form to create job
+- Insert into Supabase
+
+WAIT.
+
+----------------------------------------
+
+## STEP 7 — Booking Flow
+- Select contractor
+- Create booking
+- Store in database
+
+WAIT.
+
+----------------------------------------
+
+## STEP 8 — Bookings Page
+- Show user bookings
+- Status display
+
+WAIT.
+----------------------------------------
+
+## STEP 9 — Disputes / Support
+- Form to submit dispute
+- Store in DB
+
+WAIT.
+
+----------------------------------------
+
+## STEP 10 — UI Improvements
+- Improve layout
+- Add loading states
+- Add error handling
+
+----------------------------------------
+
+# OUTPUT FORMAT
+- Provide only relevant code for the step
+- Include file names
+- Keep explanation minimal
+
+----------------------------------------
+
+Start with STEP 1.
