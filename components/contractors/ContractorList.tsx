@@ -57,38 +57,92 @@ export default function ContractorList({
         </div>
       </div>
 
+      {/* Summary */}
+      <h2 className="text-xl font-black mb-4">
+        {filteredContractors.length} professionals found
+      </h2>
+
       {/* Results Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {filteredContractors.map((c: Contractor) => (
           <div
             key={c.id}
-            className="bg-white border-4 border-black rounded-xl p-6 shadow-[8px_8px_0px_0px_#000] hover:translate-y-[-4px] transition-all"
+            className="bg-white border-[3px] border-black rounded-lg p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-5xl">{c.image || "👷"}</span>
-              <div>
-                <h3 className="font-black text-xl">{c.name}</h3>
-                <p className="text-sm font-bold text-blue-600 uppercase tracking-tighter">
-                  {c.service}
-                </p>
+            {/* Top Section */}
+            <div className="flex justify-between items-start gap-4 mb-4">
+              <div className="flex gap-4">
+                {/* Avatar */}
+                <div className="w-[80px] h-[80px] rounded-full border-[3px] border-black flex flex-shrink-0 items-center justify-center bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-5xl overflow-hidden">
+                  {c.image || "👷"}
+                </div>
+                {/* Details */}
+                <div>
+                  <h3 className="text-2xl font-black leading-tight max-w-[150px]">
+                    {c.name.split(" ").map((n, i) => (
+                      <span key={i} className="block">
+                        {n}
+                      </span>
+                    ))}
+                  </h3>
+                  {c.verified && (
+                    <div className="inline-flex items-center gap-1 border-2 border-black rounded-md px-1.5 py-0.5 text-[10px] font-bold bg-[#e3f2fd] mt-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <i className="fas fa-check-circle text-black"></i>{" "}
+                      Verified
+                    </div>
+                  )}
+                  <div className="text-xs font-bold text-gray-700 mt-2 truncate max-w-[150px]">
+                    {c.service} • {c.location}
+                  </div>
+                </div>
+              </div>
+              {/* Rating */}
+              <div className="text-right flex-shrink-0">
+                <div className="flex items-center justify-end gap-1 font-black text-lg">
+                  <span className="text-yellow-400">⭐</span> {c.rating}{" "}
+                  <span className="text-sm font-bold text-gray-500">
+                    ({c.reviews})
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-gray-700 mt-1">
+                  {c.completed_jobs} jobs
+                </div>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-600 mb-6 italic line-clamp-2 leading-relaxed">
-              {c.description
-                ? `"${c.description}"`
-                : '"No description provided."'}
+
+            {/* Description */}
+            <p className="text-sm font-medium text-gray-800 line-clamp-3 leading-relaxed mb-5">
+              {c.description ? c.description : "No description provided."}
             </p>
-            <div className="flex justify-between items-center bg-gray-50 border-2 border-black p-3 rounded-lg font-black text-[10px] mb-6 uppercase tracking-tight">
-              <span>⭐ {c.rating}</span>
-              <span className="text-green-600">✅ Verified</span>
-              <span>📍 {c.location}</span>
+
+            {/* Price & Available */}
+            <div className="flex flex-wrap gap-3 mb-5">
+              <div className="border-[3px] border-black bg-[#fff59d] px-3 py-1 font-black text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-md">
+                {c.price || "Contact for Quote"}
+              </div>
+              {c.available && (
+                <div className="flex items-center gap-2 border-[3px] border-black bg-[#a5d6a7] px-3 py-1 font-black text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-md">
+                  <div className="w-2.5 h-2.5 bg-green-500 rounded-full border border-black"></div>
+                  Available
+                </div>
+              )}
             </div>
-            <Link
-              href={`/contractors/${c.id}`}
-              className="block w-full text-center bg-black text-white py-3 rounded-lg font-black uppercase text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,0.3)] hover:bg-gray-800 transition-all"
-            >
-              View Profile
-            </Link>
+
+            {/* Buttons */}
+            <div className="flex flex-col gap-3 mt-auto items-start">
+              <Link
+                href={`/contractors/${c.id}`}
+                className="block min-w-[140px] text-center border-[3px] border-black bg-white px-4 py-2 font-black text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-md hover:bg-gray-50 transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]"
+              >
+                View Profile
+              </Link>
+              <Link
+                href={`/book/${c.id}`}
+                className="block min-w-[140px] text-center border-[3px] border-black bg-[#64b5f6] px-4 py-2 font-black text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-md hover:bg-[#42a5f5] transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]"
+              >
+                Book Now
+              </Link>
+            </div>
           </div>
         ))}
 

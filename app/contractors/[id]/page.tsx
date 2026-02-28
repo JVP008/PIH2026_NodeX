@@ -2,21 +2,34 @@
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { seedContractors } from "@/lib/seedContractors";
+import { Contractor } from "@/types";
 
 export default async function ContractorDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id: idParam } = await params;
+  const id = parseInt(idParam, 10);
 
-  const { data: contractor, error } = await supabase
+  let contractor: Contractor | null = null;
+
+  // First try the database
+  const { data: dbContractor, error } = await supabase
     .from("contractors")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle(); // maybeSingle allows us to handle null gracefully
 
-  if (error || !contractor) notFound();
+  if (dbContractor) {
+    contractor = dbContractor;
+  } else {
+    // Fallback to seed data if database is empty or entry is missing
+    contractor = seedContractors.find((s) => s.id === id) || null;
+  }
+
+  if (!contractor) notFound();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-24 pb-40">
