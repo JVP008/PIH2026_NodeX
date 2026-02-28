@@ -1,70 +1,33 @@
 'use client';
-
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
 
 export default function Hero() {
-    const contentRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (!contentRef.current) return;
-        const els = Array.from(contentRef.current.children) as HTMLElement[];
-        els.forEach((el, i) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = `opacity 0.6s ease ${i * 0.15}s, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${i * 0.15}s`;
-            requestAnimationFrame(() => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            });
-        });
-    }, []);
-
     return (
-        <div className="relative pt-24 pb-32 overflow-hidden bg-[#fafafa]">
-            {/* Ambient Blurred Backgrounds */}
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[70%] bg-yellow-100 rounded-full blur-[100px] opacity-70 pointer-events-none"></div>
-            <div className="absolute top-[10%] right-[-10%] w-[40%] h-[60%] bg-pink-100 rounded-full blur-[100px] opacity-70 pointer-events-none"></div>
-
-            <div className="relative max-w-5xl mx-auto px-4 text-center z-10" ref={contentRef}>
-                {/* Badge */}
-                <div className="inline-block transform -rotate-2 mb-8 mt-4 hover:rotate-0 transition-transform">
-                    <span className="bg-[#FFD700] text-black text-[10px] md:text-sm font-black uppercase tracking-[0.2em] px-4 py-2 border-2 border-black neo-shadow-small">
-                        Verified Pros • 50+ Cities
-                    </span>
+        <section className="relative py-20 px-4 bg-[#fdfbf8] overflow-hidden border-b-8 border-yellow-300">
+            {/* Animated Blobs */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-40 pointer-events-none">
+                <div className="absolute top-10 left-10 w-80 h-80 bg-yellow-200 rounded-full filter blur-3xl animate-blob" />
+                <div className="absolute top-20 right-10 w-80 h-80 bg-pink-200 rounded-full filter blur-3xl animate-blob animation-delay-2000" />
+            </div>
+            <div className="relative max-w-7xl mx-auto text-center z-10">
+                <div className="inline-block transform -rotate-2 mb-6 bg-yellow-300 border-4 border-black shadow-[4px_4px_0px_0px_#000] px-6 py-2">
+                    <span className="text-sm font-black uppercase">Verified Pros · 50+ Cities</span>
                 </div>
-
-                {/* Main Headline */}
-                <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight text-black mb-6 leading-[1.1]">
+                <h1 className="text-6xl font-black mb-6 uppercase tracking-tight text-black drop-shadow-[2px_2px_0px_white]">
                     Find Trusted Pros in Minutes
                 </h1>
-
-                {/* Subtitle */}
-                <p className="text-lg md:text-xl font-medium text-black/80 max-w-2xl mx-auto mb-12">
-                    Tell us what needs fixing at home and we connect you with
-                    <br className="hidden md:block" />
-                    trusted, verified local professionals in your city.
+                <p className="text-2xl font-bold mb-8 max-w-2xl mx-auto">
+                    Tell us what needs fixing and we connect you with the best local workers in your city.
                 </p>
-
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                    <Link
-                        href="/post-job"
-                        className="flex items-center gap-3 bg-[#FFD700] text-black px-8 py-4 font-black text-sm uppercase tracking-widest border-[3px] border-black neo-shadow hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-                    >
-                        <i className="fas fa-lock"></i>
-                        Post A Job
+                <div className="flex gap-6 justify-center">
+                    <Link href="/post-job" className="bg-yellow-300 border-3 border-black px-8 py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px]">
+                        POST A JOB
                     </Link>
-
-                    <Link
-                        href="/contractors"
-                        className="flex items-center gap-3 bg-white text-black px-8 py-4 font-black text-sm uppercase tracking-widest border-[3px] border-black neo-shadow hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
-                    >
-                        <i className="fas fa-search"></i>
-                        Browse Pros
+                    <Link href="/contractors" className="bg-white border-3 border-black px-8 py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px]">
+                        BROWSE PROS
                     </Link>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

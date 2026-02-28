@@ -24,8 +24,12 @@ async function testConnection() {
 
         console.log('Connection Successful! Contractor count query works.')
         console.log('Data:', data)
-    } catch (err: any) {
-        console.error('Unexpected Error:', err.message)
+    } catch (err) {
+        if (err instanceof Error) {
+            console.error('Unexpected Error:', err.message)
+        } else {
+            console.error('Unexpected Error:', String(err))
+        }
         process.exit(1)
     }
 }

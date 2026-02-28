@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Patrick_Hand } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/ui/Toast";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
+// The core playful font for the UI
+const patrickHand = Patrick_Hand({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-patrick',
 });
-
 export const metadata: Metadata = {
-  title: "HOUSE CONNECT PRO / NEO-BRUTALIST EDITION",
-  description: "HIGH CONTRAST. HIGH TRUST. Find skilled professionals with absolute clarity.",
+  title: "HouseConnect Pro",
+  description: "India's Trusted Local Contractor Marketplace",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,16 +22,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Font Awesome for Icons */}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
-      <body
-        className={`${spaceGrotesk.variable} ${spaceGrotesk.className} antialiased bg-[#fafafa] min-h-screen selection:bg-black selection:text-[#FFD700] overflow-x-hidden`}
-      >
+      <body className={`${patrickHand.variable} font-sans antialiased bg-yellow-50 min-h-screen`}>
         <ToastProvider>
           <NavBar />
-          <div className="pt-2"> {/* Tiny offset to let shadows breathe */}
+          <main className="min-h-screen">
             {children}
-          </div>
+          </main>
           <Footer />
         </ToastProvider>
       </body>
