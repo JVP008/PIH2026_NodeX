@@ -58,7 +58,7 @@ export default function NavBar() {
                     </Link>
                     <div className="hidden md:flex items-center space-x-6">
                         <Link href="/" className={`hover:text-blue-200 transition ${isActive('/') ? 'text-blue-200 font-semibold' : ''}`}>Home</Link>
-                        <Link href="/post-job" className={`hover:text-blue-200 transition ${isActive('/post-job') ? 'text-blue-200 font-semibold' : ''}`}>Post a Job</Link>
+                        <Link href="/post-job" className={`hover:text-blue-200 transition ${isActive('/post-job') ? 'text-blue-200 font-semibold' : ''}`}>Post Your Services</Link>
                         <Link href="/contractors" className={`hover:text-blue-200 transition ${isActive('/contractors') ? 'text-blue-200 font-semibold' : ''}`}>Find Pros</Link>
                         <Link href="/bookings" className={`hover:text-blue-200 transition ${isActive('/bookings') ? 'text-blue-200 font-semibold' : ''}`}>My Bookings</Link>
                         <Link href="/disputes" className={`hover:text-blue-200 transition ${isActive('/disputes') ? 'text-blue-200 font-semibold' : ''}`}>Support</Link>

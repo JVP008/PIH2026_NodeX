@@ -6,19 +6,32 @@ export default function Hero() {
     return (
         <div className="gradient-bg text-white py-20">
             <div className="max-w-7xl mx-auto px-4 text-center">
-                <h1 className="text-5xl font-bold mb-6">Find Trusted Pros in Minutes</h1>
-                <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-                    AI-powered matching connects you with the best-rated local contractors based on your specific needs, location, and availability.
+                <h1 className="text-5xl font-bold mb-6">Connect. Work. Get It Done.</h1>
+                <p className="text-xl text-blue-100 mb-4 max-w-2xl mx-auto">
+                    Whether you&apos;re a skilled professional looking for clients, or a homeowner who needs a trusted hand — we&apos;ve got you covered.
                 </p>
-                <div className="flex flex-col md:flex-row gap-4 justify-center">
-                    <Link href="/post-job" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition text-lg flex items-center justify-center">
-                        <i className="fas fa-plus-circle mr-2"></i>Post a Job
-                    </Link>
-                    <Link href="/contractors" className="border-2 border-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition text-lg flex items-center justify-center">
-                        <i className="fas fa-search mr-2"></i>Browse Contractors
-                    </Link>
+
+                <div className="flex flex-col md:flex-row gap-6 justify-center mt-10">
+                    {/* For Professionals */}
+                    <div className="flex flex-col items-center bg-white/10 border border-white/30 rounded-2xl px-8 py-6 min-w-[220px]">
+                        <i className="fas fa-briefcase text-3xl mb-3 text-blue-200"></i>
+                        <p className="text-sm text-blue-200 mb-3 font-medium uppercase tracking-wider">I&apos;m a Professional</p>
+                        <Link href="/post-job" className="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition text-sm">
+                            Post Your Services
+                        </Link>
+                    </div>
+
+                    {/* For Homeowners */}
+                    <div className="flex flex-col items-center bg-white/10 border border-white/30 rounded-2xl px-8 py-6 min-w-[220px]">
+                        <i className="fas fa-home text-3xl mb-3 text-blue-200"></i>
+                        <p className="text-sm text-blue-200 mb-3 font-medium uppercase tracking-wider">I need a Pro</p>
+                        <Link href="/contractors" className="border-2 border-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition text-sm">
+                            Find Pros Near Me
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
+
