@@ -2,63 +2,86 @@ import Link from 'next/link';
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-gray-300 mt-20">
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+        <footer className="bg-white border-t border-gray-200 mt-20">
+            <div className="max-w-7xl mx-auto px-6 py-14">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
 
-                    {/* Brand */}
-                    <div className="md:col-span-1">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                                <i className="fas fa-home text-white text-sm"></i>
+                    {/* Brand + Socials */}
+                    <div>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
+                                <i className="fas fa-home text-black text-lg"></i>
                             </div>
-                            <span className="text-white font-bold text-lg">Houseconnect Pro</span>
+                            <span className="text-black font-black text-xl tracking-tight uppercase">Houseconnect</span>
                         </div>
-                        <p className="text-sm text-gray-400 leading-relaxed">
-                            Connecting skilled professionals with homeowners across India. Find the right pro for any job, fast.
+                        <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                            India&apos;s trusted platform connecting homeowners with verified local professionals across 50+ cities.
                         </p>
+                        <div className="flex items-center gap-3">
+                            <a href="#" aria-label="X / Twitter" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-black hover:text-black transition">
+                                <i className="fab fa-x-twitter text-sm"></i>
+                            </a>
+                            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition">
+                                <i className="fab fa-facebook-f text-sm"></i>
+                            </a>
+                            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-pink-500 hover:text-pink-500 transition">
+                                <i className="fab fa-instagram text-sm"></i>
+                            </a>
+                            <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-700 hover:text-blue-700 transition">
+                                <i className="fab fa-linkedin-in text-sm"></i>
+                            </a>
+                        </div>
                     </div>
 
-                    {/* Homeowners */}
+                    {/* Services */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">For Homeowners</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/contractors" className="hover:text-white transition">Find Pros</Link></li>
-                            <li><Link href="/bookings" className="hover:text-white transition">My Bookings</Link></li>
-                            <li><Link href="/disputes" className="hover:text-white transition">Raise a Dispute</Link></li>
+                        <h4 className="text-black font-bold text-sm uppercase tracking-widest mb-5">Services</h4>
+                        <ul className="space-y-3 text-sm text-gray-500">
+                            <li><Link href="/contractors?service=Plumbing" className="hover:text-black transition">Plumbing</Link></li>
+                            <li><Link href="/contractors?service=Electrical" className="hover:text-black transition">Electrical</Link></li>
+                            <li><Link href="/contractors?service=Cleaning" className="hover:text-black transition">Cleaning</Link></li>
+                            <li><Link href="/contractors?service=HVAC" className="hover:text-black transition">HVAC</Link></li>
+                            <li><Link href="/contractors?service=Painting" className="hover:text-black transition">Painting</Link></li>
+                            <li><Link href="/contractors?service=Landscaping" className="hover:text-black transition">Landscaping</Link></li>
                         </ul>
                     </div>
 
-                    {/* Professionals */}
+                    {/* Company */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">For Professionals</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/post-job" className="hover:text-white transition">Post Your Services</Link></li>
-                            <li><Link href="/login" className="hover:text-white transition">Login / Sign Up</Link></li>
+                        <h4 className="text-black font-bold text-sm uppercase tracking-widest mb-5">Company</h4>
+                        <ul className="space-y-3 text-sm text-gray-500">
+                            <li><Link href="#" className="hover:text-black transition">About Us</Link></li>
+                            <li><Link href="#" className="hover:text-black transition">Careers</Link></li>
+                            <li><Link href="#" className="hover:text-black transition">Privacy Policy</Link></li>
+                            <li><Link href="#" className="hover:text-black transition">Terms of Service</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Contact</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li className="flex items-start gap-2">
-                                <i className="fas fa-map-marker-alt mt-0.5 text-blue-400"></i>
-                                <span>Sakoli, Bhandara, Maharashtra 441802</span>
+                        <h4 className="text-black font-bold text-sm uppercase tracking-widest mb-5">Contact</h4>
+                        <ul className="space-y-4 text-sm text-gray-500">
+                            <li className="flex items-start gap-3">
+                                <i className="fas fa-map-marker-alt text-gray-400 mt-0.5 w-4 shrink-0"></i>
+                                <span>Sakoli, Bhandara,<br />Maharashtra 441802</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <i className="fas fa-envelope text-blue-400"></i>
-                                <a href="mailto:support@houseconnectpro.in" className="hover:text-white transition">
-                                    support@houseconnectpro.in
-                                </a>
+                            <li className="flex items-center gap-3">
+                                <i className="fas fa-phone text-gray-400 w-4 shrink-0"></i>
+                                <a href="tel:+918263884655" className="hover:text-black transition">+91 8263884655</a>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <i className="fas fa-envelope text-gray-400 w-4 shrink-0"></i>
+                                <a href="mailto:support@houseconnect.in" className="hover:text-black transition">support@houseconnect.in</a>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </div>
 
-                <div className="border-t border-gray-700 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-                    <p>© {new Date().getFullYear()} Houseconnect Pro. All rights reserved.</p>
-                    <p>Made with <i className="fas fa-heart text-red-500"></i> in Maharashtra</p>
+            {/* Dashed divider + copyright */}
+            <div className="border-t border-dashed border-gray-300">
+                <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-center text-sm text-gray-400">
+                    <p>© 2026 HouseConnect Pro. All rights reserved. Made with <i className="fas fa-heart text-red-500 mx-1"></i> in India</p>
                 </div>
             </div>
         </footer>
