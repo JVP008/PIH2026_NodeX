@@ -12,8 +12,6 @@ interface ContractorListProps {
     initialContractors: Contractor[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
 const DUMMY_CONTRACTORS: Contractor[] = [
     {
         id: 1, name: 'Rajesh Sharma', service: 'Plumbing',
@@ -133,7 +131,7 @@ export default function ContractorList({ initialContractors }: ContractorListPro
 
     const confirmBooking = async () => {
         if (!bookingDate || !bookingTime || !selectedContractor) {
-            showToast('Please select date and time', 'error');
+            showToast('Select date and time', 'error');
             return;
         }
 
@@ -151,23 +149,23 @@ export default function ContractorList({ initialContractors }: ContractorListPro
         if (error) console.warn('Booking failed (auth?)', error);
 
         setIsScheduleModalOpen(false);
-        showToast('Booking confirmed!');
+        showToast('Booking success!');
         setTimeout(() => router.push('/bookings'), 1500);
     };
 
     return (
         <div className="flex flex-col md:flex-row gap-8">
             {/* Filters */}
-            <div className="md:w-64 shrink-0">
-                <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
-                    <h3 className="font-bold text-lg mb-4">Filters</h3>
+            <div className="md:w-72 shrink-0">
+                <div className="bg-white border-[4px] border-black p-8 sticky top-24 neo-shadow-large">
+                    <h3 className="text-2xl font-[900] uppercase tracking-tighter mb-6 underline underline-offset-4 decoration-4 decoration-[#FFD700]">Filters</h3>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
+                    <div className="mb-6">
+                        <label className="block text-xs font-black uppercase tracking-widest mb-2">Service Type</label>
                         <select
                             value={filters.service}
                             onChange={(e) => handleFilterChange('service', e.target.value)}
-                            className="w-full p-2 border rounded-lg"
+                            className="w-full p-3 border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none transition-colors"
                         >
                             <option value="">All Services</option>
                             <option value="Plumbing">Plumbing</option>
@@ -179,12 +177,12 @@ export default function ContractorList({ initialContractors }: ContractorListPro
                         </select>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
+                    <div className="mb-6">
+                        <label className="block text-xs font-black uppercase tracking-widest mb-2">Rating</label>
                         <select
                             value={filters.rating}
                             onChange={(e) => handleFilterChange('rating', parseFloat(e.target.value))}
-                            className="w-full p-2 border rounded-lg"
+                            className="w-full p-3 border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none transition-colors"
                         >
                             <option value="0">Any Rating</option>
                             <option value="4.5">4.5+ Stars</option>
@@ -193,48 +191,52 @@ export default function ContractorList({ initialContractors }: ContractorListPro
                         </select>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
-                        <div className="space-y-2">
-                            <label className="flex items-center">
+                    <div className="mb-8">
+                        <label className="block text-xs font-black uppercase tracking-widest mb-4">Availability</label>
+                        <div className="space-y-4">
+                            <label className="flex items-center group cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={filters.available}
                                     onChange={(e) => handleFilterChange('available', e.target.checked)}
-                                    className="mr-2"
+                                    className="w-6 h-6 border-[3px] border-black rounded-none appearance-none checked:bg-black transition-colors mr-3"
                                 />
-                                <span className="text-sm">Available Now</span>
+                                <span className="text-xs font-black uppercase tracking-wider group-hover:text-amber-500">Available Now</span>
                             </label>
-                            <label className="flex items-center">
+                            <label className="flex items-center group cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={filters.verified}
                                     onChange={(e) => handleFilterChange('verified', e.target.checked)}
-                                    className="mr-2"
+                                    className="w-6 h-6 border-[3px] border-black rounded-none appearance-none checked:bg-black transition-colors mr-3"
                                 />
-                                <span className="text-sm">Verified Pro</span>
+                                <span className="text-xs font-black uppercase tracking-wider group-hover:text-amber-500">Verified Pro</span>
                             </label>
                         </div>
                     </div>
 
-                    <button onClick={resetFilters} className="w-full text-blue-600 py-2 text-sm hover:underline">Reset Filters</button>
+                    <button onClick={resetFilters} className="w-full bg-black text-white py-3 text-xs font-black uppercase tracking-[0.2em] border-2 border-black hover:bg-white hover:text-black transition-all active:scale-95">Reset All</button>
                 </div>
             </div>
 
             {/* Contractor List */}
             <div className="flex-1">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold">Find Pros Near You</h2>
-                    <span className="text-gray-500">{contractors.length} pro{contractors.length !== 1 ? 's' : ''} found</span>
+                <div className="flex items-end justify-between mb-10 pb-4 border-b-[6px] border-black">
+                    <div>
+                        <h2 className="text-5xl font-[900] uppercase tracking-tighter leading-none">Find Pros</h2>
+                        <p className="text-sm font-black uppercase tracking-[0.3em] mt-2 opacity-50">Local experts near you</p>
+                    </div>
+                    <span className="bg-black text-white px-4 py-2 text-xs font-black uppercase neo-shadow-small rotate-2">{contractors.length} found</span>
                 </div>
-                <div className="grid gap-6">
+
+                <div className="grid gap-10">
                     {contractors.length > 0 ? contractors.map((c) => (
                         <ContractorCard key={c.id} contractor={c} onBook={handleBook} />
                     )) : (
-                        <div className="text-center py-16 bg-white rounded-xl shadow-md">
-                            <i className="fas fa-hard-hat text-5xl text-gray-300 mb-4"></i>
-                            <h3 className="text-lg font-semibold text-gray-500 mb-2">No pros found</h3>
-                            <p className="text-gray-400 text-sm">Try changing your filters, or check back later as new professionals join.</p>
+                        <div className="text-center py-20 bg-white border-[4px] border-black neo-shadow-large">
+                            <i className="fas fa-hard-hat text-7xl text-black mb-6 animate-bounce"></i>
+                            <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Nothing Found!</h3>
+                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest px-10">Try changing your filters or checking a different category.</p>
                         </div>
                     )}
                 </div>
@@ -245,46 +247,54 @@ export default function ContractorList({ initialContractors }: ContractorListPro
                 onClose={() => setIsScheduleModalOpen(false)}
                 title="Schedule Appointment"
             >
-                <div className="flex items-center mb-6 pb-6 border-b">
-                    <div className="text-4xl mr-4">{selectedContractor?.image}</div>
-                    <div>
-                        <h4 className="font-bold text-lg">{selectedContractor?.name}</h4>
-                        <p className="text-gray-500">{selectedContractor?.service} • {selectedContractor?.price}</p>
+                <div className="p-2">
+                    <div className="flex items-center mb-8 pb-8 border-b-2 border-black border-dashed">
+                        <div className="text-6xl mr-6 rotate-[-10deg] drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">{selectedContractor?.image}</div>
+                        <div>
+                            <h4 className="font-black uppercase text-2xl tracking-tighter">{selectedContractor?.name}</h4>
+                            <div className="flex gap-2 mt-1">
+                                <span className="bg-[#FFD700] border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase">{selectedContractor?.service}</span>
+                                <span className="bg-[#4ECDC4] border-2 border-black px-2 py-0.5 text-[10px] font-black uppercase">{selectedContractor?.price}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Select Date</label>
-                    <input
-                        type="date"
-                        value={bookingDate}
-                        onChange={(e) => setBookingDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full p-3 border border-gray-300 rounded-lg"
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 font-medium mb-2">Select Time Slot</label>
-                    <div className="grid grid-cols-3 gap-2">
-                        {['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'].map((slot) => (
-                            <button
-                                key={slot}
-                                onClick={() => setBookingTime(slot)}
-                                className={`p-2 text-sm border rounded-lg ${bookingTime === slot ? 'border-blue-500 bg-blue-50' : 'hover:border-blue-500 hover:bg-blue-50'}`}
-                            >
-                                {slot}
-                            </button>
-                        ))}
+                    <div className="mb-8 rotate-1">
+                        <label className="block text-xs font-black uppercase tracking-widest mb-3">Pick a Date</label>
+                        <input
+                            type="date"
+                            value={bookingDate}
+                            onChange={(e) => setBookingDate(e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                            className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-sm focus:bg-yellow-50 outline-none neo-shadow-small"
+                        />
                     </div>
-                </div>
 
-                <button
-                    onClick={confirmBooking}
-                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition"
-                >
-                    Confirm Booking
-                </button>
+                    <div className="mb-10 -rotate-1">
+                        <label className="block text-xs font-black uppercase tracking-widest mb-3">Choose a Slot</label>
+                        <div className="grid grid-cols-3 gap-3">
+                            {['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'].map((slot) => (
+                                <button
+                                    key={slot}
+                                    onClick={() => setBookingTime(slot)}
+                                    className={`p-3 text-[10px] font-black uppercase border-[3px] border-black transition-all ${bookingTime === slot
+                                            ? 'bg-black text-white translate-y-1 shadow-none'
+                                            : 'bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:translate-y-[-1px]'
+                                        }`}
+                                >
+                                    {slot}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={confirmBooking}
+                        className="w-full bg-black text-white py-5 border-[4px] border-black font-[900] text-xl uppercase tracking-widest neo-shadow hover:bg-[#FFD700] hover:text-black hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-0 active:translate-y-0 active:shadow-none"
+                    >
+                        Confirm Booking
+                    </button>
+                </div>
             </Modal>
         </div>
     );

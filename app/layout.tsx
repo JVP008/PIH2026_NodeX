@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Houseconnect Pro - Find Trusted Local Contractors",
-  description: "Houseconnect Pro connects skilled professionals with homeowners across India. Find the right pro for any job, fast.",
+  title: "HOUSE CONNECT PRO / NEO-BRUTALIST EDITION",
+  description: "HIGH CONTRAST. HIGH TRUST. Find skilled professionals with absolute clarity.",
 };
 
 export default function RootLayout({
@@ -31,11 +31,13 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F3F4ED] min-h-screen selection:bg-black selection:text-[#FFD700]`}
       >
         <ToastProvider>
           <NavBar />
-          {children}
+          <div className="pt-2"> {/* Tiny offset to let shadows breathe */}
+            {children}
+          </div>
           <Footer />
         </ToastProvider>
       </body>

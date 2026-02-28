@@ -29,18 +29,24 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+        <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 py-12"
+            onClick={onClose}
+        >
             <div
-                className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                className="bg-white border-[4px] border-black max-w-2xl w-full max-h-full overflow-y-auto neo-shadow-large animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="p-6 border-b flex items-center justify-between">
-                    <h3 className="text-xl font-bold">{title}</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                <div className="p-8 border-b-[4px] border-black flex items-center justify-between bg-[#FFD700]">
+                    <h3 className="text-3xl font-[900] uppercase tracking-tighter text-black select-none">{title}</h3>
+                    <button
+                        onClick={onClose}
+                        className="w-10 h-10 bg-black text-white border-2 border-black flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                    >
                         <i className="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                <div className="p-6">
+                <div className="p-8 bg-white">
                     {children}
                 </div>
             </div>

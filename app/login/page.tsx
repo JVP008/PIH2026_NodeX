@@ -29,11 +29,11 @@ export default function LoginPage() {
                     if (profileError) console.warn('Profile creation failed', profileError);
                 }
 
-                showToast('Signup successful! Check your email.');
+                showToast('Signup successful! Check email.');
             } else {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                showToast('Login successful!');
+                showToast('Login success!');
                 router.push('/');
                 router.refresh();
             }
@@ -46,79 +46,80 @@ export default function LoginPage() {
 
     const handleGuest = () => {
         localStorage.setItem('isGuest', 'true');
-        showToast('Browsing as guest — some features are limited.');
+        showToast('Browsing as guest.');
         router.push('/');
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        {isSignUp ? 'Create your account' : 'Sign in to your account'}
+        <div className="min-h-screen flex items-center justify-center bg-[#FFD700] py-12 px-4 shadow-[inset_0_0_100px_rgba(0,0,0,0.1)]">
+            <div className="max-w-md w-full space-y-8 bg-white border-[4px] border-black p-10 neo-shadow-large">
+                <div className="text-center">
+                    <h2 className="text-4xl font-[900] uppercase tracking-tighter text-black leading-none">
+                        {isSignUp ? 'Create Account' : 'Welcome Back'}
                     </h2>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] mt-2 opacity-50">
+                        {isSignUp ? 'Join the pro network' : 'Sign in to your portal'}
+                    </p>
                 </div>
+
                 <form className="mt-8 space-y-6" onSubmit={handleAuth}>
-                    <div className="rounded-md shadow-sm -space-y-px">
+                    <div className="space-y-4">
                         <div>
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-1 ml-1">Email</label>
                             <input
                                 type="email"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Email address"
+                                className="w-full px-4 py-3 border-[3px] border-black font-bold focus:bg-yellow-50 outline-none transition-colors neo-shadow-small"
+                                placeholder="name@company.com"
                                 value={email}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                             />
                         </div>
                         <div>
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-1 ml-1">Password</label>
                             <input
                                 type="password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Password"
+                                className="w-full px-4 py-3 border-[3px] border-black font-bold focus:bg-yellow-50 outline-none transition-colors neo-shadow-small"
+                                placeholder="••••••••"
                                 value={password}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-black text-white py-4 border-[3px] border-black font-black uppercase text-sm tracking-widest neo-shadow hover:bg-white hover:text-black hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all disabled:opacity-50"
+                    >
+                        {loading ? 'Processing...' : (isSignUp ? 'Join Now' : 'Enter Portal')}
+                    </button>
                 </form>
 
-                {/* Divider */}
-                <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span className="text-sm text-gray-400">or</span>
-                    <div className="flex-1 h-px bg-gray-200" />
+                <div className="flex items-center gap-4">
+                    <div className="flex-1 h-px bg-black opacity-20" />
+                    <span className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">or</span>
+                    <div className="flex-1 h-px bg-black opacity-20" />
                 </div>
 
-                {/* Guest button */}
                 <button
                     onClick={handleGuest}
-                    className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition"
+                    className="w-full flex items-center justify-center gap-3 py-3 border-[3px] border-black bg-[#4ECDC4] font-black uppercase text-[10px] tracking-[0.2em] neo-shadow-small hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-0"
                 >
-                    <i className="fas fa-user-secret text-gray-500" />
+                    <i className="fas fa-user-secret" />
                     Continue as Guest
                 </button>
 
-                <div className="text-center">
+                <div className="text-center pt-4">
                     <button
-                        className="text-sm text-blue-600 hover:text-blue-500"
+                        className="text-xs font-black uppercase tracking-widest border-b-2 border-transparent hover:border-black transition-all"
                         onClick={() => setIsSignUp(!isSignUp)}
                     >
-                        {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                        {isSignUp ? 'Already a member? Log in' : "New here? Create account"}
                     </button>
                 </div>
             </div>
         </div>
     );
 }
-

@@ -7,7 +7,6 @@ export default function Services() {
     const router = useRouter();
 
     const handleServiceClick = (service: string) => {
-        // Navigate to post-job with service pre-selected (can be done via query param)
         router.push(`/post-job?service=${service}`);
     };
 
@@ -21,9 +20,14 @@ export default function Services() {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-16">
-            <h2 className="text-3xl font-bold text-center mb-12">Our Services</h2>
-            <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="max-w-7xl mx-auto px-4 py-24">
+            <div className="text-center mb-16">
+                <h2 className="text-5xl md:text-7xl font-[900] uppercase tracking-tighter text-black leading-none inline-block border-b-8 border-black pb-2">
+                    Our Services
+                </h2>
+                <p className="text-xs font-black uppercase tracking-[0.4em] mt-4 opacity-40 italic">Quality help for every home</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
                 {services.map((s) => (
                     <ServiceCard
                         key={s.name}

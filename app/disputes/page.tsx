@@ -28,7 +28,7 @@ export default function DisputesPage() {
         const { data: bookingsData } = await supabase
             .from('bookings')
             .select('*, contractor:contractors(name)')
-            .in('status', ['completed']); // Only completed bookings can be disputed
+            .in('status', ['completed', 'upcoming']);
         setBookings(bookingsData || []);
     }, []);
 
@@ -45,7 +45,7 @@ export default function DisputesPage() {
             fetchData();
         };
         checkAuth();
-    }, [fetchData]);
+    }, [fetchData, router]);
 
     const handleShowForm = (type: string) => {
         setDisputeType(type);
@@ -54,7 +54,7 @@ export default function DisputesPage() {
 
     const handleSubmit = async () => {
         if (!formData.bookingId || !formData.description) {
-            showToast('Please fill in all required fields', 'error');
+            showToast('Fill all fields!', 'error');
             return;
         }
 
@@ -72,79 +72,95 @@ export default function DisputesPage() {
 
         setShowForm(false);
         setFormData({ bookingId: '', description: '', resolution: 'refund' });
-        showToast('Dispute submitted successfully.');
+        showToast('System log updated.');
         fetchData();
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-12">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-2xl font-bold mb-2">Support & Dispute Resolution</h2>
-                <p className="text-gray-500 mb-8">We&apos;re here to help resolve any issues with your bookings</p>
-
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-blue-50 p-6 rounded-xl text-center cursor-pointer hover:bg-blue-100 transition" onClick={() => handleShowForm('refund')}>
-                        <i className="fas fa-money-bill-wave text-3xl text-blue-600 mb-3"></i>
-                        <h3 className="font-semibold">Payment Issue</h3>
-                        <p className="text-sm text-gray-600">Refunds, billing questions</p>
-                    </div>
-                    <div className="bg-orange-50 p-6 rounded-xl text-center cursor-pointer hover:bg-orange-100 transition" onClick={() => handleShowForm('quality')}>
-                        <i className="fas fa-tools text-3xl text-orange-600 mb-3"></i>
-                        <h3 className="font-semibold">Service Quality</h3>
-                        <p className="text-sm text-gray-600">Work not as expected</p>
-                    </div>
-                    <div className="bg-red-50 p-6 rounded-xl text-center cursor-pointer hover:bg-red-100 transition" onClick={() => handleShowForm('noshow')}>
-                        <i className="fas fa-user-times text-3xl text-red-600 mb-3"></i>
-                        <h3 className="font-semibold">No Show</h3>
-                        <p className="text-sm text-gray-600">Contractor didn&apos;t arrive</p>
+        <div className="max-w-5xl mx-auto px-4 py-20 pb-40">
+            <div className="bg-white border-[4px] border-black p-10 neo-shadow-large">
+                <div className="mb-12 border-b-[6px] border-black pb-4 flex items-end justify-between">
+                    <div>
+                        <h2 className="text-5xl md:text-7xl font-[900] uppercase tracking-tighter text-black leading-none">Dispute Terminal</h2>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-3 opacity-40 italic">Resolution hub</p>
                     </div>
                 </div>
 
-                {showForm && (
-                    <div className="border-t pt-6 animate-fade-in">
-                        <h3 className="font-semibold text-lg mb-4">Report an Issue</h3>
+                <div className="grid md:grid-cols-3 gap-8 mb-16">
+                    {[
+                        { id: 'refund', t: 'Payment Issue', d: 'Billing & Refunds', i: 'fa-money-bill-wave', c: 'bg-yellow-400' },
+                        { id: 'quality', t: 'Service Quality', d: 'Workmanship issues', i: 'fa-tools', c: 'bg-[#4ECDC4]' },
+                        { id: 'noshow', t: 'System Failure', d: 'Contractor No-Show', i: 'fa-user-times', c: 'bg-[#FF6B6B]' },
+                    ].map((cat) => (
+                        <div
+                            key={cat.id}
+                            className={`${cat.c} border-[3px] border-black p-8 text-center cursor-pointer neo-shadow-small hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none group flex flex-col items-center justify-center`}
+                            onClick={() => handleShowForm(cat.id)}
+                        >
+                            <i className={`fas ${cat.i} text-4xl text-black mb-4 group-hover:rotate-12 transition-transform`}></i>
+                            <h3 className="font-black uppercase text-sm tracking-widest">{cat.t}</h3>
+                            <p className="text-[10px] font-bold uppercase opacity-60 mt-2">{cat.d}</p>
+                        </div>
+                    ))}
+                </div>
 
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-medium mb-2">Select Booking</label>
-                            <select
-                                value={formData.bookingId}
-                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, bookingId: e.target.value })}
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                            >
-                                <option value="">Choose a booking</option>
-                                {bookings.map((b: Booking) => (
-                                    <option key={b.id} value={b.id}>
-                                        {b.service || 'Service'} - {b.contractor?.name} ({b.date})
-                                    </option>
-                                ))}
-                            </select>
+                {showForm && (
+                    <div className="border-[4px] border-black p-10 mb-16 bg-yellow-50 neo-shadow animate-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-10 h-10 bg-black text-white border-2 border-black flex items-center justify-center -rotate-6">
+                                <i className="fas fa-file-invoice text-lg"></i>
+                            </div>
+                            <h3 className="font-black uppercase text-2xl tracking-tighter">Submit Report</h3>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-gray-700 font-medium mb-2">Describe the Issue</label>
+                        <div className="grid md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Target Booking</label>
+                                <select
+                                    value={formData.bookingId}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, bookingId: e.target.value })}
+                                    className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-xs focus:bg-yellow-100 outline-none neo-shadow-small"
+                                >
+                                    <option value="">SELECT LOG ENTRY</option>
+                                    {bookings.map((b: Booking) => (
+                                        <option key={b.id} value={b.id}>
+                                            {b.service || 'SERVICE'} - {b.contractor?.name} ({b.date})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="mb-10">
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Incident Briefing</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
                                 rows={4}
-                                className="w-full p-3 border border-gray-300 rounded-lg"
-                                placeholder="Please provide details..."
+                                className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-xs focus:bg-yellow-100 outline-none neo-shadow-small"
+                                placeholder="PROVIDE ABSOLUTE CLARITY ON THE CASE..."
                             ></textarea>
                         </div>
 
-                        <button onClick={handleSubmit} className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition">
-                            Submit Dispute
+                        <button
+                            onClick={handleSubmit}
+                            className="w-full bg-black text-white py-5 border-[4px] border-black font-[900] text-xl uppercase tracking-widest neo-shadow hover:bg-[#FF6B6B] hover:text-black transition-all active:translate-y-1 active:shadow-none"
+                        >
+                            TRANSMIT REPORT TO HQ
                         </button>
                     </div>
                 )}
 
                 {/* Active Disputes */}
-                <div className="mt-8 border-t pt-6">
-                    <h3 className="font-semibold text-lg mb-4">Your Active Cases</h3>
-                    <div className="space-y-4">
+                <div>
+                    <h3 className="text-3xl font-[900] uppercase tracking-tighter mb-8 italic underline decoration-8 decoration-[#FFD700]">Open Terminals</h3>
+                    <div className="grid gap-8">
                         {disputes.length > 0 ? disputes.map((d: Dispute) => (
                             <DisputeCard key={d.id} dispute={d} />
                         )) : (
-                            <p className="text-gray-500">No active disputes</p>
+                            <div className="text-center py-20 border-[3px] border-black border-dashed opacity-30">
+                                <p className="text-xs font-black uppercase tracking-[0.4em]">All system nodes healthy. No active disputes.</p>
+                            </div>
                         )}
                     </div>
                 </div>
