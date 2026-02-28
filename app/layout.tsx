@@ -4,6 +4,8 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/ui/Toast";
+// import { Analytics } from "@vercel/analytics/next";
+// import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const patrickHand = Patrick_Hand({
   weight: '400',
@@ -36,6 +38,8 @@ export default function RootLayout({
           </main>
           <Footer />
         </ToastProvider>
+        {/* <Analytics /> */}
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );
