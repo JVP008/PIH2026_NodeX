@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HomeConnect Pro - Find Trusted Local Contractors",
+  title: "House Connect Bro - Find Trusted Local Contractors",
   description: "AI-powered matching connects you with the best-rated local contractors based on your specific needs.",
 };
 

@@ -41,7 +41,7 @@ export default function NavBar() {
                 <div className="flex items-center justify-between">
                     <Link href="/" className="flex items-center space-x-2 cursor-pointer">
                         <i className="fas fa-home text-2xl"></i>
-                        <span className="text-xl font-bold">HomeConnect Pro</span>
+                        <span className="text-xl font-bold">House Connect Bro</span>
                     </Link>
                     <div className="hidden md:flex items-center space-x-6">
                         <Link href="/" className={`hover:text-blue-200 transition ${isActive('/') ? 'text-blue-200 font-semibold' : ''}`}>Home</Link>
