@@ -1,170 +1,246 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
-import { useToast } from '@/components/ui/Toast';
-import DisputeCard from '@/components/disputes/DisputeCard';
-import { Dispute, Booking } from '@/types';
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useToast } from "@/components/ui/Toast";
+import { supabase } from "@/lib/supabaseClient";
+import DisputeCard from "@/components/disputes/DisputeCard";
+import { Dispute } from "@/types";
 
 export default function DisputesPage() {
-    const [disputes, setDisputes] = useState<Dispute[]>([]);
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const [showForm, setShowForm] = useState(false);
-    const [disputeType, setDisputeType] = useState('');
-    const [formData, setFormData] = useState({
-        bookingId: '',
-        description: '',
-        resolution: 'refund'
-    });
-    const { showToast } = useToast();
+  const { showToast } = useToast();
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-    const fetchData = useCallback(async () => {
-        const { data: disputesData } = await supabase
-            .from('disputes')
-            .select('*, booking:bookings(contractor:contractors(name, service))');
-        setDisputes(disputesData || []);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    bookingId: "",
+    type: "Poor Quality Work",
+    description: "",
+  });
 
-        const { data: bookingsData } = await supabase
-            .from('bookings')
-            .select('*, contractor:contractors(name, service)')
-            .in('status', ['completed', 'upcoming']);
-        setBookings(bookingsData || []);
-    }, []);
+  const fetchDisputes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("disputes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setDisputes(data || []);
+    } catch (err) {
+      console.error("Fetch disputes error:", err);
+      showToast("Failed to load history", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]); // showToast is stable, but good practice to include if it were to change
 
-    const router = useRouter();
+  useEffect(() => {
+    fetchDisputes();
+  }, [fetchDisputes]);
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            const isGuest = typeof window !== 'undefined' && localStorage.getItem('isGuest') === 'true';
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user && !isGuest) {
-                router.push('/login');
-                return;
-            }
-            fetchData();
-        };
-        checkAuth();
-    }, [fetchData, router]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.type || !form.description) {
+      showToast("Fill mandatory fields!", "error");
+      return;
+    }
 
-    const handleShowForm = (type: string) => {
-        setDisputeType(type);
-        setShowForm(true);
-    };
+    setSubmitting(true);
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
 
-    const handleSubmit = async () => {
-        if (!formData.bookingId || !formData.description) {
-            showToast('Fill all fields!', 'error');
-            return;
-        }
+      const { error } = await supabase.from("disputes").insert([
+        {
+          name: form.name,
+          email: form.email || user?.email || null,
+          booking_id: form.bookingId || null,
+          type: form.type,
+          description: form.description,
+          user_id: user?.id || null,
+        },
+      ]);
 
-        const { error } = await supabase
-            .from('disputes')
-            .insert([{
-                booking_id: formData.bookingId,
-                type: disputeType,
-                description: formData.description,
-                status: 'In Review',
-                user_id: (await supabase.auth.getUser()).data.user?.id
-            }]);
+      if (error) throw error;
+      showToast("Dispute filed! Resolution in 24h.");
+      setForm({
+        name: "",
+        email: "",
+        bookingId: "",
+        type: "Poor Quality Work",
+        description: "",
+      });
+      fetchDisputes();
+    } catch (err) {
+      console.error("Submit dispute error:", err);
+      showToast("Submission failed", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-        if (error) console.warn('Dispute failed', error);
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-20 pb-40">
+      <Link
+        href="/"
+        className="text-[10px] font-black uppercase tracking-widest hover:underline decoration-2 mb-8 inline-block"
+      >
+        &larr; Return to HQ
+      </Link>
 
-        setShowForm(false);
-        setFormData({ bookingId: '', description: '', resolution: 'refund' });
-        showToast('System log updated.');
-        fetchData();
-    };
-
-    return (
-        <div className="max-w-5xl mx-auto px-4 py-20 pb-40">
-            <div className="bg-white border-[4px] border-black p-10 neo-shadow-large">
-                <div className="mb-12 border-b-[6px] border-black pb-4 flex items-end justify-between">
-                    <div>
-                        <h2 className="text-5xl md:text-7xl font-[900] uppercase tracking-tighter text-black leading-none">Dispute Terminal</h2>
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-3 opacity-40 italic">Resolution hub</p>
-                    </div>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-8 mb-16">
-                    {[
-                        { id: 'refund', t: 'Payment Issue', d: 'Billing & Refunds', i: 'fa-money-bill-wave', c: 'bg-yellow-400' },
-                        { id: 'quality', t: 'Service Quality', d: 'Workmanship issues', i: 'fa-tools', c: 'bg-[#4ECDC4]' },
-                        { id: 'noshow', t: 'System Failure', d: 'Contractor No-Show', i: 'fa-user-times', c: 'bg-[#FF6B6B]' },
-                    ].map((cat) => (
-                        <div
-                            key={cat.id}
-                            className={`${cat.c} border-[3px] border-black p-8 text-center cursor-pointer neo-shadow-small hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none group flex flex-col items-center justify-center`}
-                            onClick={() => handleShowForm(cat.id)}
-                        >
-                            <i className={`fas ${cat.i} text-4xl text-black mb-4 group-hover:rotate-12 transition-transform`}></i>
-                            <h3 className="font-black uppercase text-sm tracking-widest">{cat.t}</h3>
-                            <p className="text-[10px] font-bold uppercase opacity-60 mt-2">{cat.d}</p>
-                        </div>
-                    ))}
-                </div>
-
-                {showForm && (
-                    <div className="border-[4px] border-black p-10 mb-16 bg-yellow-50 neo-shadow animate-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="w-10 h-10 bg-black text-white border-2 border-black flex items-center justify-center -rotate-6">
-                                <i className="fas fa-file-invoice text-lg"></i>
-                            </div>
-                            <h3 className="font-black uppercase text-2xl tracking-tighter">Submit Report</h3>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-8 mb-8">
-                            <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Target Booking</label>
-                                <select
-                                    value={formData.bookingId}
-                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, bookingId: e.target.value })}
-                                    className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-xs focus:bg-yellow-100 outline-none neo-shadow-small"
-                                >
-                                    <option value="">SELECT LOG ENTRY</option>
-                                    {bookings.map((b: Booking) => (
-                                        <option key={b.id} value={b.id}>
-                                            {b.contractor?.service || 'SERVICE'} - {b.contractor?.name} ({b.date})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="mb-10">
-                            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">Incident Briefing</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
-                                rows={4}
-                                className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-xs focus:bg-yellow-100 outline-none neo-shadow-small"
-                                placeholder="PROVIDE ABSOLUTE CLARITY ON THE CASE..."
-                            ></textarea>
-                        </div>
-
-                        <button
-                            onClick={handleSubmit}
-                            className="w-full bg-black text-white py-5 border-[4px] border-black font-[900] text-xl uppercase tracking-widest neo-shadow hover:bg-[#FF6B6B] hover:text-black transition-all active:translate-y-1 active:shadow-none"
-                        >
-                            TRANSMIT REPORT TO HQ
-                        </button>
-                    </div>
-                )}
-
-                {/* Active Disputes */}
-                <div>
-                    <h3 className="text-3xl font-[900] uppercase tracking-tighter mb-8 italic underline decoration-8 decoration-[#FFD700]">Open Terminals</h3>
-                    <div className="grid gap-8">
-                        {disputes.length > 0 ? disputes.map((d: Dispute) => (
-                            <DisputeCard key={d.id} dispute={d} />
-                        )) : (
-                            <div className="text-center py-20 border-[3px] border-black border-dashed opacity-30">
-                                <p className="text-xs font-black uppercase tracking-[0.4em]">All system nodes healthy. No active disputes.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+      <div className="mb-12 border-b-[8px] border-black pb-4 flex items-end justify-between">
+        <div>
+          <h2 className="text-5xl md:text-7xl font-[900] uppercase tracking-tighter text-black leading-none">
+            Issue Portal
+          </h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-3 opacity-40 italic">
+            Dispute resolution protocol
+          </p>
         </div>
-    );
+        <div className="hidden md:block">
+          <div className="w-16 h-16 bg-red-400 border-[3px] border-black flex items-center justify-center rotate-6 neo-shadow-small">
+            <i className="fas fa-exclamation-triangle text-black text-2xl animate-pulse"></i>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-[1fr_350px] gap-12 items-start">
+        {/* Form Section */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border-[4px] border-black p-8 neo-shadow-large"
+        >
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
+                Requester Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full p-3 bg-white border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none neo-shadow-small"
+                placeholder="YOUR FULL NAME"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
+                Contact Email
+              </label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full p-3 bg-white border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none neo-shadow-small"
+                placeholder="REACH@EMAIL.COM"
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
+                Target Booking ID
+              </label>
+              <input
+                type="text"
+                value={form.bookingId}
+                onChange={(e) =>
+                  setForm({ ...form, bookingId: e.target.value })
+                }
+                className="w-full p-3 bg-white border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none neo-shadow-small"
+                placeholder="UID-887-XXXX"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
+                Violation Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                className="w-full p-3 bg-white border-[3px] border-black font-bold uppercase text-xs focus:bg-yellow-50 outline-none neo-shadow-small"
+              >
+                <option value="Poor Quality Work">POOR QUALITY WORK</option>
+                <option value="Contractor No-Show">CONTRACTOR NO-SHOW</option>
+                <option value="Refund Request">REFUND REQUEST</option>
+                <option value="Payment Issue">PAYMENT DIScrepancy</option>
+                <option value="Other">MISCELLANEOUS ISSUE</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mb-10">
+            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
+              Situation Briefing <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              rows={6}
+              className="w-full p-4 bg-white border-[3px] border-black font-medium text-xs focus:bg-yellow-50 outline-none neo-shadow-small"
+              placeholder="PLEASE DESCRIBE THE INCIDENT IN DETAIL..."
+              required
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-black text-white py-6 border-[3px] border-black font-[900] text-xl uppercase tracking-widest neo-shadow hover:bg-red-500 transition-all active:shadow-none active:translate-y-1 disabled:opacity-50"
+          >
+            {submitting ? "TRANSMITTING..." : "INITIATE DISPUTE"}
+          </button>
+          <p className="text-center text-[8px] font-black uppercase tracking-[0.3em] mt-6 opacity-30 italic">
+            Resolution expected within 24 standard cycles
+          </p>
+        </form>
+
+        {/* Sidebar / History */}
+        <div>
+          <div className="bg-[#FFD700] border-[4px] border-black p-6 mb-10 -rotate-2 neo-shadow-small">
+            <h3 className="font-[900] uppercase text-xl mb-2 italic tracking-tighter">
+              Archive Stats
+            </h3>
+            <p className="text-[10px] font-black uppercase opacity-60 leading-tight">
+              Total cases recorded: {disputes.length}
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="font-[900] uppercase text-xs tracking-[0.3em] border-b-4 border-black inline-block mb-4">
+              Transmission History
+            </h3>
+
+            {loading ? (
+              <div className="space-y-4 animate-pulse">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-32 bg-gray-200 border-[3px] border-gray-300 rounded-xl"
+                  ></div>
+                ))}
+              </div>
+            ) : disputes.length > 0 ? (
+              disputes.map((dispute) => (
+                <DisputeCard key={dispute.id} dispute={dispute} />
+              ))
+            ) : (
+              <div className="text-center py-12 border-[3px] border-black border-dashed opacity-30 italic">
+                <p className="text-[10px] font-black uppercase tracking-widest">
+                  No active cases
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

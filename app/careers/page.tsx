@@ -1,52 +1,52 @@
-import Link from 'next/link';
-
-const POSITIONS = [
-    { title: 'Senior React Engineer', type: 'Remote (India) • Full-time', color: 'bg-[#FFD700]' },
-    { title: 'Onboarding Specialist', type: 'Nagpur / Hybrid • Full-time', color: 'bg-[#4ECDC4]' },
-    { title: 'Success Manager', type: 'Mumbai • Full-time', color: 'bg-[#FF6B6B]' },
-];
-
+import React from "react";
 export default function CareersPage() {
-    return (
-        <div className="max-w-5xl mx-auto px-6 py-24 my-20">
-            <div className="mb-16 border-b-[8px] border-black pb-8">
-                <h1 className="text-6xl md:text-8xl font-[900] uppercase tracking-tighter text-black leading-none italic">Join The Squad</h1>
-                <p className="text-xs font-black uppercase tracking-[0.4em] mt-6 opacity-40">Help us architect the future of local services</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-10">
-                {POSITIONS.map((pos) => (
-                    <div key={pos.title} className="group relative bg-white border-[4px] border-black p-8 neo-shadow-large hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
-                        <div className={`w-12 h-12 ${pos.color} border-[3px] border-black flex items-center justify-center mb-6 -rotate-6 group-hover:rotate-0 transition-all neo-shadow-small`}>
-                            <i className="fas fa-bolt text-black"></i>
-                        </div>
-                        <h3 className="text-2xl font-[900] uppercase tracking-tight mb-2 underline decoration-4 decoration-black/10 group-hover:decoration-black/40 transition-all">{pos.title}</h3>
-                        <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-10">{pos.type}</p>
-
-                        <Link
-                            href="mailto:careers@houseconnect.in"
-                            className="block w-full text-center bg-black text-white py-4 border-[3px] border-black font-black uppercase text-xs tracking-[0.2em] neo-shadow-small hover:bg-[#FFD700] hover:text-black hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all active:translate-y-0"
-                        >
-                            Submit Intel
-                        </Link>
-                    </div>
-                ))}
-            </div>
-
-            <div className="mt-20 border-[4px] border-black p-10 bg-black text-[#FFD700] neo-shadow-large rotate-1">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 italic">Ghost Role?</h2>
-                        <p className="text-[10px] uppercase font-black tracking-widest opacity-70">Don&apos;t see a match? Send your dossier to our HQ anyway.</p>
-                    </div>
-                    <a
-                        href="mailto:careers@houseconnect.in"
-                        className="px-10 py-5 bg-[#FFD700] text-black border-[4px] border-[#FFD700] font-black uppercase text-sm tracking-widest hover:bg-black hover:text-[#FFD700] transition-colors neo-shadow-small"
-                    >
-                        careers@houseconnect.in
-                    </a>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-green-50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_#000]">
+        <div className="w-16 h-16 bg-blue-300 border-3 border-black rounded-lg flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_#000]">
+          <i className="fas fa-briefcase text-2xl text-black"></i>
         </div>
-    );
+
+        <h1 className="text-5xl font-black uppercase tracking-tight mb-8 text-black">
+          Careers
+        </h1>
+        <div className="space-y-6 text-xl font-medium text-black leading-relaxed">
+          <p>
+            We are a small team with a massive goal to organize the home
+            services market across India. Up until now, finding reliable help
+            has been totally broken. We are fixing that, block by block.
+          </p>
+          <p>
+            Right now, we are looking for passionate builders. You do not need a
+            fancy degree to join us. You just need to care deeply about the user
+            experience and be willing to solve tough problems.
+          </p>
+          {/* Roles List */}
+          <div className="bg-yellow-100 p-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#000] mt-8">
+            <h3 className="font-black uppercase text-2xl mb-4">Open Roles</h3>
+            <ul className="space-y-4">
+              <li className="flex justify-between items-center border-b-2 border-black pb-4">
+                <div>
+                  <div className="font-black">Frontend Engineer</div>
+                  <div className="text-gray-600 text-sm">Remote, India</div>
+                </div>
+                <button className="bg-black text-white px-4 py-2 rounded font-bold hover:bg-gray-800 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-y-1">
+                  Apply
+                </button>
+              </li>
+              <li className="flex justify-between items-center">
+                <div>
+                  <div className="font-black">Community Manager</div>
+                  <div className="text-gray-600 text-sm">Mumbai, Hub</div>
+                </div>
+                <button className="bg-black text-white px-4 py-2 rounded font-bold hover:bg-gray-800 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-none hover:translate-y-1">
+                  Apply
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

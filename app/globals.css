@@ -18,7 +18,7 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Neo-Brutalist Utilities */
+/* Sketch Theme Utilities */
 .sketch-border {
   border: 3px solid #000;
 }
@@ -70,9 +70,47 @@ body {
   box-shadow: 2px 2px 0px 0px #000;
 }
 
-/* Animations included in your theme */
-@keyframes float {
+.sketch-input {
+  border: 3px solid #000;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
 
+.sketch-input:focus {
+  outline: none;
+  box-shadow: 4px 4px 0px 0px #000;
+}
+
+/* Animations */
+.pulse-dot {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-1deg);
+  }
+
+  50% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes float {
   0%,
   100% {
     transform: translateY(0);
@@ -83,10 +121,67 @@ body {
   }
 }
 
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-wiggle:hover {
+  animation: wiggle 0.3s ease-in-out infinite;
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
+.animate-pop:active {
+  animation: pop 0.2s ease-in-out;
+}
+
+/* Fade-in for AI detection */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Match animation for contractor cards */
+@keyframes matchSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.match-animation {
+  animation: matchSlide 0.5s ease-out forwards;
+}
+
+/* Blob animations */
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);

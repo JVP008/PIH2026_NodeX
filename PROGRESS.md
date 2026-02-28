@@ -46,8 +46,8 @@ This session focused on building the full foundation of the platform from scratc
 #### 5. User Role Flows — Hero Section
 
 - Redesigned the homepage Hero section with **two distinct user journey cards**:
-  - *"I'm a Professional"* → directs to Post Your Services
-  - *"I need a Pro"* → directs to Find Pros Near Me
+  - _"I'm a Professional"_ → directs to Post Your Services
+  - _"I need a Pro"_ → directs to Find Pros Near Me
 - This clarifies the two-sided marketplace to first-time visitors
 
 #### 6. Professional Service Listing — Post Your Services

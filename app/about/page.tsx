@@ -1,33 +1,40 @@
+import React from "react";
 export default function AboutPage() {
-    return (
-        <div className="max-w-5xl mx-auto px-10 py-24 my-20 bg-white border-[6px] border-black neo-shadow-large rotate-[-1deg]">
-            <h1 className="text-6xl md:text-8xl font-[900] uppercase tracking-tighter text-black leading-none mb-12 drop-shadow-[6px_6px_0_rgba(255,215,0,1)] rotate-1">
-                The Pro Mission
-            </h1>
-
-            <div className="space-y-12 text-black font-bold uppercase tracking-tight">
-                <p className="text-2xl md:text-4xl leading-tight border-b-[8px] border-black pb-8 italic">
-                    Finding reliable, skilled local professionals should not be a struggle. We built this engine to solve it.
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-12 text-sm leading-relaxed tracking-wider">
-                    <p className="bg-yellow-100 p-6 border-[3px] border-black neo-shadow-small rotate-1">
-                        Our platform bridges the gap between hardworking contractors and homeowners who need quality work done right. Whether it&apos;s fixing a tricky plumbing leak, undertaking a fresh paint job, or a complete electrical overhaul, we verify and seamlessly connect you with the best independent professionals.
-                    </p>
-                    <p className="bg-cyan-100 p-6 border-[3px] border-black neo-shadow-small -rotate-1">
-                        Instead of relying on unverified word-of-mouth or browsing endless online directories, we bring the best talent directly to your screen. Ratings, transparent pricing, and instant availability statuses are baked directly into our system logic.
-                    </p>
-                </div>
-
-                <div className="mt-20">
-                    <h2 className="text-4xl font-[900] uppercase tracking-tighter mb-6 underline decoration-8 decoration-[#FFD700]">The Manifesto</h2>
-                    <div className="bg-black text-white p-12 border-[4px] border-black neo-shadow hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[15px_15px_0px_0px_#4ECDC4] transition-all">
-                        <p className="text-xl md:text-2xl font-black uppercase leading-tight tracking-[0.05em]">
-                            Empower local tradespeople to grow their independent businesses while giving homeowners absolute peace of mind, pricing transparency, and top-tier service standards.
-                        </p>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-pink-50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_#000]">
+        {/* Icon Badge */}
+        <div className="w-16 h-16 bg-yellow-300 border-3 border-black rounded-lg flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_#000]">
+          <i className="fas fa-users text-2xl text-black"></i>
         </div>
-    );
+
+        <h1 className="text-5xl font-black uppercase tracking-tight mb-8 text-black">
+          About Us
+        </h1>
+        <div className="space-y-6 text-xl font-medium text-black leading-relaxed">
+          <p>
+            We started HouseConnect because finding a good plumber or
+            electrician in India should not feel like a gamble. We are just a
+            group of people who got tired of sketchy repairs and inflated
+            prices. So we built this platform to fix that problem for everyone.
+          </p>
+          <p>
+            We check every professional&apos;s ID and background before they can
+            take a job here. We also collect real reviews from real people. If
+            something goes wrong, we step in to help fix it. That is our promise
+            to you.
+          </p>
+
+          {/* Mission Box */}
+          <div className="bg-blue-100 p-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#000] mt-8">
+            <h3 className="font-black uppercase text-2xl mb-2">Our Mission</h3>
+            <p>
+              To make home maintenance completely stress-free for every Indian
+              household. No haggling. No showing up late. Just good honest work.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

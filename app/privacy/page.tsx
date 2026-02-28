@@ -1,45 +1,48 @@
-export default function PrivacyPolicyPage() {
-    return (
-        <div className="max-w-5xl mx-auto px-10 py-24 my-24 bg-white border-[6px] border-black neo-shadow-large">
-            <h1 className="text-6xl md:text-8xl font-[900] uppercase tracking-tighter text-black leading-none mb-4 italic">Privacy Vault</h1>
-            <p className="text-xs font-black uppercase tracking-[0.4em] mb-16 opacity-40">System Revision: February 2026</p>
-
-            <div className="space-y-12 text-black font-bold uppercase tracking-tight">
-                <section className="bg-yellow-50 p-10 border-[3px] border-black neo-shadow-small rotate-1">
-                    <h2 className="text-3xl font-[900] uppercase tracking-tighter mb-6 underline decoration-4 decoration-black/20">1. Data Capture</h2>
-                    <p className="text-sm leading-relaxed tracking-wider">
-                        We collect information you provide directly to us when setting up an account, booking a contractor, or interacting with our customer support. This includes your name, contact information, service address, and payment details (processed securely by our partners).
-                    </p>
-                </section>
-
-                <section className="bg-cyan-50 p-10 border-[3px] border-black neo-shadow-small -rotate-1">
-                    <h2 className="text-3xl font-[900] uppercase tracking-tighter mb-6 underline decoration-4 decoration-black/20">2. Deployment Logic</h2>
-                    <p className="text-sm leading-relaxed tracking-wider mb-6">
-                        Your data is never sold to third-party data brokers. We use your information exclusively to:
-                    </p>
-                    <ul className="space-y-4">
-                        {['Match you with relevant local pros', 'Facilitate secure node communication', 'Provide priority support & resolution', 'Maintain system security & integrity'].map((item) => (
-                            <li key={item} className="flex gap-4 items-center group">
-                                <div className="w-4 h-4 bg-black group-hover:bg-[#FFD700] transition-colors" />
-                                <span className="text-xs font-black uppercase tracking-widest">{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-
-                <section className="p-10 border-[3px] border-black neo-shadow-small">
-                    <h2 className="text-3xl font-[900] uppercase tracking-tighter mb-6 underline decoration-4 decoration-black/20">3. Encryption Protocols</h2>
-                    <p className="text-sm leading-relaxed tracking-wider">
-                        We implement industry-standard security protocols to protect your personal information against unauthorized access, alteration, or destruction. We treat your privacy as mission-critical.
-                    </p>
-                </section>
-
-                <div className="bg-black text-[#FFD700] p-10 border-[4px] border-black neo-shadow-large translate-y-4">
-                    <p className="text-lg font-black uppercase tracking-widest text-center">
-                        Questions? Link with us at <a href="mailto:privacy@houseconnect.in" className="underline decoration-4">privacy@houseconnect.in</a>.
-                    </p>
-                </div>
-            </div>
+import React from "react";
+export default function PrivacyPage() {
+  return (
+    <div className="min-h-screen bg-blue-50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_#000]">
+        <div className="w-16 h-16 bg-orange-300 border-3 border-black rounded-lg flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_#000]">
+          <i className="fas fa-shield-alt text-2xl text-black"></i>
         </div>
-    );
+
+        <h1 className="text-5xl font-black uppercase tracking-tight mb-8 text-black">
+          Privacy Policy
+        </h1>
+        <div className="space-y-6 text-lg font-medium text-black leading-relaxed">
+          <p>
+            We value your trust above everything else. When you share your data
+            with us, we treat it with massive respect. This page explains
+            exactly what we collect and why we need it.
+          </p>
+
+          <div className="bg-white p-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#000]">
+            <h3 className="font-black uppercase text-xl mb-2">
+              What we collect
+            </h3>
+            <p className="mb-4">
+              We only ask for details that help us connect you with contractors.
+              This means your name, phone number, and coarse location data so we
+              can find professionals near your house.
+            </p>
+            <h3 className="font-black uppercase text-xl mb-2">
+              Who we share it with
+            </h3>
+            <p>
+              We never sell your data to random ad companies. We only share the
+              necessary job details with the verified professional you choose to
+              hire.
+            </p>
+          </div>
+
+          <p>
+            If you want us to delete your account and all associated data, just
+            drop us an email at support@houseconnect.in and we will wipe it
+            within 24 hours. No questions asked.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

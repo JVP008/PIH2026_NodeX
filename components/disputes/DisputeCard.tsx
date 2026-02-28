@@ -1,28 +1,55 @@
-'use client';
+"use client";
 
-import { Dispute } from '@/types';
+import { Dispute } from "@/types";
 
 export default function DisputeCard({ dispute }: { dispute: Dispute }) {
-    return (
-        <div className="border-[3px] border-black p-6 flex items-center justify-between bg-white neo-shadow-small hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all">
-            <div className="space-y-1">
-                <h4 className="font-black uppercase text-sm tracking-tight border-b-2 border-black/10 pb-1 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-black" />
-                    {dispute.booking?.contractor?.service || 'SERVICE'} — {dispute.booking?.contractor?.name || 'CONTRACTOR'}
-                </h4>
-                <div className="flex gap-4 pt-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                        DATE: {dispute.created_at ? new Date(dispute.created_at).toLocaleDateString() : 'UNKNOWN'}
-                    </p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#FF6B6B]">
-                        TYPE: {dispute.type}
-                    </p>
-                </div>
-            </div>
+  const getStatusStyle = (status: string | null) => {
+    switch (status?.toLowerCase()) {
+      case "resolved":
+        return "bg-green-200";
+      case "rejected":
+        return "bg-red-200";
+      case "in review":
+      default:
+        return "bg-yellow-200";
+    }
+  };
 
-            <div className={`px-4 py-2 border-[2px] border-black font-[900] text-[10px] uppercase tracking-[0.2em] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FFD700] text-black italic -rotate-2`}>
-                {dispute.status}
-            </div>
+  return (
+    <div className="bg-white border-3 border-black rounded-xl shadow-[6px_6px_0px_0px_#000] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_#000] transition-all">
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="bg-black text-white px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded leading-none">
+            Case #{dispute.id.slice(0, 8)}
+          </span>
+          <h4 className="font-black text-lg uppercase tracking-tight">
+            {dispute.type.replace(/([A-Z])/g, " $1")}
+          </h4>
         </div>
-    );
+        <p className="text-black font-medium text-sm leading-relaxed mb-2">
+          {dispute.description}
+        </p>
+        <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+          <span>
+            <i className="far fa-calendar-alt mr-1"></i>{" "}
+            {dispute.created_at
+              ? new Date(dispute.created_at).toLocaleDateString("en-IN")
+              : "Unknown Date"}
+          </span>
+          {dispute.name && (
+            <span>
+              <i className="far fa-user mr-1"></i> {dispute.name}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="shrink-0">
+        <span
+          className={`px-4 py-1.5 rounded-lg font-black border-2 border-black shadow-[3px_3px_0px_0px_#000] text-xs uppercase tracking-widest ${getStatusStyle(dispute.status)}`}
+        >
+          {dispute.status || "In Review"}
+        </span>
+      </div>
+    </div>
+  );
 }
