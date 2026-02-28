@@ -8,24 +8,19 @@ import { supabase } from '@/lib/supabaseClient';
 export default function NavBar() {
     const pathname = usePathname();
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
     const [isGuest, setIsGuest] = useState(false);
 
     useEffect(() => {
-        const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
-        };
-        getUser();
-
-        // Check guest mode
+        // Read guest flag instantly from localStorage — no network call
         if (typeof window !== 'undefined') {
             setIsGuest(localStorage.getItem('isGuest') === 'true');
         }
 
+        // Auth state listener — fires immediately with cached session, no network hang
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            if (session?.user) setIsGuest(false); // clear guest if real user logs in
+            setUserEmail(session?.user?.email ?? null);
+            if (session?.user) setIsGuest(false);
         });
 
         return () => subscription.unsubscribe();
@@ -64,9 +59,9 @@ export default function NavBar() {
                         <Link href="/disputes" className={`hover:text-blue-200 transition ${isActive('/disputes') ? 'text-blue-200 font-semibold' : ''}`}>Support</Link>
                     </div>
                     <div className="flex items-center space-x-4">
-                        {user ? (
+                        {userEmail ? (
                             <>
-                                <span className="text-sm">Welcome, {user.email?.split('@')[0]}</span>
+                                <span className="text-sm">Welcome, {userEmail.split('@')[0]}</span>
                                 <button onClick={handleLogout} className="text-sm hover:text-blue-200">Logout</button>
                                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                                     <i className="fas fa-user"></i>
