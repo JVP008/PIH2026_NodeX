@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/components/ui/Toast';
@@ -107,11 +107,11 @@ export default function DisputesPage() {
                             <label className="block text-gray-700 font-medium mb-2">Select Booking</label>
                             <select
                                 value={formData.bookingId}
-                                onChange={(e) => setFormData({ ...formData, bookingId: e.target.value })}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, bookingId: e.target.value })}
                                 className="w-full p-3 border border-gray-300 rounded-lg"
                             >
                                 <option value="">Choose a booking</option>
-                                {bookings.map(b => (
+                                {bookings.map((b: Booking) => (
                                     <option key={b.id} value={b.id}>
                                         {b.service || 'Service'} - {b.contractor?.name} ({b.date})
                                     </option>
@@ -123,7 +123,7 @@ export default function DisputesPage() {
                             <label className="block text-gray-700 font-medium mb-2">Describe the Issue</label>
                             <textarea
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
                                 rows={4}
                                 className="w-full p-3 border border-gray-300 rounded-lg"
                                 placeholder="Please provide details..."
@@ -140,7 +140,7 @@ export default function DisputesPage() {
                 <div className="mt-8 border-t pt-6">
                     <h3 className="font-semibold text-lg mb-4">Your Active Cases</h3>
                     <div className="space-y-4">
-                        {disputes.length > 0 ? disputes.map(d => (
+                        {disputes.length > 0 ? disputes.map((d: Dispute) => (
                             <DisputeCard key={d.id} dispute={d} />
                         )) : (
                             <p className="text-gray-500">No active disputes</p>
