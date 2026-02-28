@@ -44,7 +44,7 @@ body {
 }
 
 .sketch-card:hover {
-  transform: translate(-2px, -2px) rotate(0.5deg);
+  transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0px 0px #000;
 }
 
@@ -59,7 +59,7 @@ body {
 }
 
 .sketch-button:hover {
-  transform: translate(-2px, -2px) rotate(-1deg);
+  transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px 0px #000;
   background-color: #fef08a;
   /* yellow-200 */
@@ -89,6 +89,7 @@ body {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -100,6 +101,7 @@ body {
 }
 
 @keyframes wiggle {
+
   0%,
   100% {
     transform: rotate(-1deg);
@@ -111,6 +113,7 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
@@ -147,6 +150,19 @@ body {
   animation: pop 0.2s ease-in-out;
 }
 
+/* Update Sketch Utilities to use animations */
+.sketch-button:hover {
+  transform: translate(-2px, -2px) rotate(-1deg);
+  box-shadow: 6px 6px 0px 0px #000;
+  background-color: #fef08a;
+  /* yellow-200 */
+}
+
+.sketch-card:hover {
+  transform: translate(-2px, -2px) rotate(0.5deg);
+  box-shadow: 8px 8px 0px 0px #000;
+}
+
 /* Fade-in for AI detection */
 @keyframes fadeIn {
   from {
@@ -181,7 +197,7 @@ body {
   animation: matchSlide 0.5s ease-out forwards;
 }
 
-/* Blob animations */
+/* Blob animations for ImpactBanner */
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
