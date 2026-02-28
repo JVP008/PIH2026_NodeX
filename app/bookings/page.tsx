@@ -1,225 +1,191 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import BookingCard from "@/components/bookings/BookingCard";
-import { supabase } from "@/lib/supabaseClient";
-import { useToast } from "@/components/ui/Toast";
-import Modal from "@/components/ui/Modal";
-import { Booking } from "@/types";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useToast } from '@/components/ui/Toast';
+import { supabase } from '@/lib/supabaseClient';
+import Modal from '@/components/ui/Modal';
+
+interface BookingRow {
+    id: string;
+    date: string;
+    time: string;
+    status: string | null;
+    price: number | null;
+    notes: string | null;
+    contractor: { name: string; image: string } | null;
+}
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const { showToast } = useToast();
+    const { showToast } = useToast();
+    const [bookings, setBookings] = useState<BookingRow[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('all');
+    const [payModalOpen, setPayModalOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
 
-  const router = useRouter();
+    useEffect(() => {
+        fetchBookings();
+    }, []);
 
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    const { data } = await supabase
-      .from("bookings")
-      .select("*, contractor:contractors(name, image)")
-      .order("date", { ascending: false });
+    const fetchBookings = async () => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('bookings')
+                .select('*, contractor:contractors(name, image)')
+                .order('date', { ascending: false });
 
-    setBookings(data || []);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const isGuest =
-        typeof window !== "undefined" &&
-        localStorage.getItem("isGuest") === "true";
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user && !isGuest) {
-        router.push("/login");
-        return;
-      }
-      fetchBookings();
+            if (error) throw error;
+            setBookings(data || []);
+        } catch {
+            showToast('Failed to load bookings', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
-    checkAuth();
-  }, [router, fetchBookings]);
 
-  const handlePay = (booking: Booking) => {
-    setSelectedBooking(booking);
-    setIsPaymentModalOpen(true);
-  };
+    const handleCancel = async (id: string) => {
+        const { error } = await supabase
+            .from('bookings')
+            .update({ status: 'cancelled' })
+            .eq('id', id);
 
-  const processPayment = async () => {
-    if (!selectedBooking) return;
-    if (!cardNumber || !expiry || !cvv) {
-      showToast("Fill card details!", "error");
-      return;
-    }
+        if (error) {
+            showToast('Failed to cancel booking', 'error');
+            return;
+        }
+        showToast('Booking cancelled successfully');
+        fetchBookings();
+    };
 
-    await supabase
-      .from("bookings")
-      .update({ status: "upcoming" })
-      .eq("id", selectedBooking.id);
+    const handlePay = (booking: BookingRow) => {
+        setSelectedBooking(booking);
+        setPayModalOpen(true);
+    };
 
-    setIsPaymentModalOpen(false);
-    showToast("Payment verified!");
-    fetchBookings();
-  };
+    const confirmPayment = async () => {
+        if (!selectedBooking) return;
+        const { error } = await supabase
+            .from('bookings')
+            .update({ status: 'completed' })
+            .eq('id', selectedBooking.id);
 
-  const filteredBookings =
-    filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
+        if (error) {
+            showToast('Payment failed', 'error');
+            return;
+        }
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-20 pb-40">
-      <div className="mb-12 border-b-[8px] border-black pb-4 flex items-end justify-between">
-        <div>
-          <h2 className="text-5xl md:text-7xl font-[900] uppercase tracking-tighter text-black leading-none">
-            Your Orders
-          </h2>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-3 opacity-40 italic">
-            System activity logs
-          </p>
+        setPayModalOpen(false);
+        showToast('Payment successful! (Demo)');
+        fetchBookings();
+    };
+
+    const filtered = bookings.filter(b => filter === 'all' || b.status === filter);
+
+    const statusColor: Record<string, string> = {
+        upcoming: 'bg-blue-200',
+        completed: 'bg-green-200',
+        pending: 'bg-yellow-200',
+        cancelled: 'bg-red-200',
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto px-4 py-12">
+            <Link href="/" className="text-black font-bold hover:underline decoration-2 decoration-black underline-offset-2 mb-4 inline-block">&larr; Back to Home</Link>
+            <h1 className="text-4xl font-black uppercase tracking-tight mb-6">My Bookings</h1>
+
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap gap-2 mb-6">
+                {['all', 'upcoming', 'completed', 'pending', 'cancelled'].map(f => (
+                    <button
+                        key={f}
+                        onClick={() => setFilter(f)}
+                        className={`px-4 py-2 border-2 border-black rounded-lg font-bold capitalize transition-all shadow-[2px_2px_0px_0px_#000] ${filter === f ? 'bg-yellow-300 translate-y-[-1px] shadow-[3px_3px_0px_0px_#000]' : 'bg-white hover:bg-gray-50'}`}
+                    >
+                        {f}
+                    </button>
+                ))}
+            </div>
+
+            {/* Loading */}
+            {loading && (
+                <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="bg-white border-3 border-black rounded-xl p-6 animate-pulse shadow-[4px_4px_0px_0px_#ccc]">
+                            <div className="h-5 bg-gray-200 rounded w-1/2 mb-3"></div>
+                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Bookings List */}
+            {!loading && (
+                <div className="space-y-4">
+                    {filtered.length > 0 ? filtered.map((booking) => (
+                        <div key={booking.id} className="bg-white border-3 border-black rounded-xl p-6 shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_0px_#000] transition-all">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl">{booking.contractor?.image || '🔧'}</span>
+                                    <div>
+                                        <h3 className="font-black text-lg">{booking.contractor?.name || 'Unknown Contractor'}</h3>
+                                        <p className="text-black font-medium">
+                                            {new Date(booking.date).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })} • {booking.time}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className={`px-3 py-1 border-2 border-black rounded-lg font-bold text-sm capitalize ${statusColor[booking.status || 'pending'] || 'bg-gray-200'} shadow-[2px_2px_0px_0px_#000]`}>
+                                    {booking.status || 'pending'}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between border-t-2 border-dashed border-gray-300 pt-4">
+                                <span className="font-black text-xl">₹{booking.price || 0}</span>
+                                <div className="flex gap-2">
+                                    {booking.status === 'upcoming' && (
+                                        <>
+                                            <button onClick={() => handlePay(booking)} className="px-4 py-2 bg-green-300 border-2 border-black rounded-lg font-bold shadow-[2px_2px_0px_0px_#000] hover:translate-y-[-1px] transition-all">
+                                                Pay ₹{booking.price}
+                                            </button>
+                                            <button onClick={() => handleCancel(booking.id)} className="px-4 py-2 bg-red-300 border-2 border-black rounded-lg font-bold shadow-[2px_2px_0px_0px_#000] hover:translate-y-[-1px] transition-all">
+                                                Cancel
+                                            </button>
+                                        </>
+                                    )}
+                                    {booking.status === 'completed' && (
+                                        <Link href="/disputes" className="px-4 py-2 bg-orange-300 border-2 border-black rounded-lg font-bold shadow-[2px_2px_0px_0px_#000] hover:translate-y-[-1px] transition-all">
+                                            Report Issue
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )) : (
+                        <div className="text-center py-16 bg-white border-3 border-black rounded-xl shadow-[4px_4px_0px_0px_#000]">
+                            <p className="text-2xl font-black text-gray-300 mb-2">No bookings {filter !== 'all' ? `with status "${filter}"` : 'yet'}</p>
+                            <Link href="/contractors" className="text-blue-600 font-bold hover:underline">Browse Pros →</Link>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Payment Modal */}
+            <Modal isOpen={payModalOpen} onClose={() => setPayModalOpen(false)} title="Pay Securely (Demo)">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-black mb-4">
+                        Confirm payment of <span className="font-black text-2xl">₹{selectedBooking?.price || 0}</span> to{' '}
+                        <span className="font-black">{selectedBooking?.contractor?.name}</span>
+                    </p>
+                    <div className="bg-green-50 border-2 border-black rounded-lg p-4 mb-6 shadow-[2px_2px_0px_0px_#000]">
+                        <p className="text-sm font-bold text-gray-600">🔒 Secured by RazorPay (Demo Mode)</p>
+                    </div>
+                    <button onClick={confirmPayment} className="w-full bg-green-400 text-black border-3 border-black py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] hover:bg-green-500 transition-all text-xl uppercase">
+                        Pay ₹{selectedBooking?.price || 0}
+                    </button>
+                </div>
+            </Modal>
         </div>
-        <div className="hidden md:block">
-          <span className="bg-black text-white px-4 py-2 text-xs font-black uppercase neo-shadow-small rotate-3">
-            {bookings.length} Total
-          </span>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-4 mb-10">
-        {["all", "upcoming", "completed", "pending"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-6 py-3 border-[3px] border-black text-xs font-black uppercase tracking-widest transition-all ${
-              filter === f
-                ? "bg-black text-white neo-shadow-small translate-y-1"
-                : "bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:-translate-y-1"
-            }`}
-          >
-            {f === "pending" ? "Unpaid" : f}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-8">
-        {loading ? (
-          <div className="text-center py-20 font-black uppercase tracking-widest animate-pulse opacity-20">
-            Accessing archives...
-          </div>
-        ) : filteredBookings.length > 0 ? (
-          filteredBookings.map((b) => (
-            <BookingCard
-              key={b.id}
-              booking={{ ...b, service: "Service Request" } as Booking}
-              onPay={handlePay}
-            />
-          ))
-        ) : (
-          <div className="text-center py-24 bg-white border-[4px] border-black neo-shadow-large">
-            <i className="fas fa-ghost text-6xl text-black mb-6"></i>
-            <h3 className="text-3xl font-black uppercase tracking-tighter">
-              Archive Is Empty
-            </h3>
-            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-widest px-10">
-              You haven&apos;t scheduled any missions yet.
-            </p>
-          </div>
-        )}
-      </div>
-
-      <Modal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        title="Terminal Payment"
-      >
-        <div className="p-2">
-          <div className="bg-[#4ECDC4] border-[3px] border-black p-6 mb-8 neo-shadow-small rotate-1">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">
-                Service Charge
-              </span>
-              <span className="font-black text-xl">
-                ₹{selectedBooking?.price || 0}
-              </span>
-            </div>
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">
-                Relay Fee (10%)
-              </span>
-              <span className="font-black text-sm">
-                ₹{((selectedBooking?.price || 0) * 0.1).toFixed(0)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center border-t-4 border-black border-dotted pt-4 mt-2">
-              <span className="text-sm font-black uppercase tracking-tighter">
-                Total Bill
-              </span>
-              <span className="text-3xl font-[900] underline decoration-4 decoration-black">
-                ₹{((selectedBooking?.price || 0) * 1.1).toFixed(0)}
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="-rotate-1">
-              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
-                Card Terminal ID
-              </label>
-              <input
-                type="text"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-sm focus:bg-yellow-50 outline-none neo-shadow-small"
-                placeholder="1234 5678 9012 3456"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 rotate-1">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
-                  Expiry
-                </label>
-                <input
-                  type="text"
-                  value={expiry}
-                  onChange={(e) => setExpiry(e.target.value)}
-                  className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-sm focus:bg-yellow-50 outline-none neo-shadow-small"
-                  placeholder="MM / YY"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
-                  Secret Key (CVV)
-                </label>
-                <input
-                  type="text"
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value)}
-                  className="w-full p-4 border-[3px] border-black bg-white font-black uppercase text-sm focus:bg-yellow-50 outline-none neo-shadow-small"
-                  placeholder="123"
-                />
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={processPayment}
-            className="w-full bg-black text-white py-6 border-[4px] border-black font-[900] text-xl uppercase tracking-widest neo-shadow hover:bg-[#FFD700] hover:text-black hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-0 active:translate-y-0 active:shadow-none mt-10"
-          >
-            <i className="fas fa-lock mr-4"></i>AUTHENTICATE & PAY
-          </button>
-          <p className="text-center text-[8px] font-black uppercase tracking-[0.3em] mt-6 opacity-30">
-            End-to-end encrypted node connection
-          </p>
-        </div>
-      </Modal>
-    </div>
-  );
+    );
 }

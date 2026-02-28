@@ -1,113 +1,54 @@
-"use client";
+import Link from 'next/link';
+import { Contractor } from '@/types';
 
-import { Booking } from "@/types";
-
-interface BookingCardProps {
-  booking: Booking;
-  onPay?: (booking: Booking) => void;
-  onReview?: (booking: Booking) => void;
-  onDispute?: (booking: Booking) => void;
-}
-
-export default function BookingCard({
-  booking,
-  onPay,
-  onReview,
-  onDispute,
-}: BookingCardProps) {
-  const getStatusStyles = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "upcoming":
-        return "bg-[#4ECDC4] border-black text-black";
-      case "completed":
-        return "bg-[#10b981] border-black text-white";
-      case "pending":
-        return "bg-[#FFD700] border-black text-black";
-      default:
-        return "bg-gray-200 border-black text-black";
+export default function BookingCard({ booking }: {
+    booking: {
+        id: string;
+        date: string;
+        time: string;
+        status: string | null;
+        price: number | null;
+        contractor: Contractor | null;
     }
-  };
+}) {
+    const statusColors: Record<string, string> = {
+        upcoming: 'bg-blue-200',
+        completed: 'bg-green-200',
+        pending: 'bg-yellow-200',
+        cancelled: 'bg-red-200'
+    };
 
-  return (
-    <div className="bg-white border-[3px] border-black p-8 neo-shadow-small transition-transform hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-6">
-          <div className="text-6xl drop-shadow-[4px_4px_0_rgba(0,0,0,1)] rotate-[-5deg] group-hover:rotate-0 transition-transform">
-            {booking.contractor?.image || "👤"}
-          </div>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h3 className="font-[900] uppercase text-xl tracking-tighter leading-none">
-                {booking.service || "Service Request"}
-              </h3>
-              <span
-                className={`px-2 py-0.5 border-2 text-[8px] font-black uppercase tracking-widest ${getStatusStyles(booking.status)}`}
-              >
-                {booking.status}
-              </span>
+    return (
+        <div className="bg-white border-3 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_#000]">
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                    <span className="text-3xl">{booking.contractor?.image || '🔧'}</span>
+                    <div>
+                        <h3 className="font-black text-lg">{booking.contractor?.name || 'Contractor'}</h3>
+                        <p className="text-black font-medium text-sm">
+                            {new Date(booking.date).toLocaleDateString('en-IN')} • {booking.time}
+                        </p>
+                    </div>
+                </div>
+                <span className={`px-3 py-1 border-2 border-black rounded-lg font-bold text-xs capitalize ${statusColors[booking.status || 'pending']} shadow-[2px_2px_0px_0px_#000]`}>
+                    {booking.status || 'pending'}
+                </span>
             </div>
-            <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">
-              {booking.contractor?.name || "Unknown Pro"}
-            </p>
-            <div className="flex items-center gap-4">
-              <p className="text-[10px] font-black uppercase bg-black text-white px-2 py-1 rotate-1">
-                <i className="far fa-calendar mr-2"></i>
-                {booking.date}
-              </p>
-              <p className="text-[10px] font-black uppercase bg-yellow-300 border-2 border-black px-2 py-0.5 -rotate-1">
-                <i className="far fa-clock mr-2"></i>
-                {booking.time}
-              </p>
+            <div className="flex items-center justify-between border-t-2 border-dashed border-gray-300 pt-3">
+                <span className="font-black text-lg">₹{booking.price || 0}</span>
+                <div className="flex gap-2">
+                    {booking.status === 'upcoming' && (
+                        <button className="px-3 py-1 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]">
+                            Pay ₹{booking.price}
+                        </button>
+                    )}
+                    {booking.status === 'completed' && (
+                        <Link href="/disputes" className="px-3 py-1 bg-orange-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]">
+                            Report
+                        </Link>
+                    )}
+                </div>
             </div>
-          </div>
         </div>
-
-        <div className="flex flex-col items-end gap-3 w-full md:w-auto">
-          <p className="font-[900] text-3xl uppercase tracking-tighter leading-none">
-            ₹{booking.price}
-          </p>
-          <div className="flex gap-3 w-full justify-end">
-            {booking.status === "upcoming" && (
-              <>
-                <button className="text-[10px] font-black uppercase border-b-2 border-black hover:text-amber-500 hover:border-amber-500 transition-colors">
-                  Reschedule
-                </button>
-                <button className="text-[10px] font-black uppercase border-b-2 border-black hover:text-red-500 hover:border-red-500 transition-colors">
-                  Cancel
-                </button>
-              </>
-            )}
-            {booking.status === "pending" && onPay && (
-              <button
-                onClick={() => onPay(booking)}
-                className="bg-[#10b981] text-black border-[3px] border-black px-4 py-2 text-[10px] font-black uppercase tracking-widest neo-shadow-small hover:bg-black hover:text-white transition-all active:translate-y-1 active:shadow-none"
-              >
-                Pay Now
-              </button>
-            )}
-            {booking.status === "completed" && (
-              <>
-                {onReview && (
-                  <button
-                    onClick={() => onReview(booking)}
-                    className="text-[10px] font-black uppercase border-b-2 border-black hover:text-blue-500 hover:border-blue-500 transition-colors"
-                  >
-                    Leave Review
-                  </button>
-                )}
-                {onDispute && (
-                  <button
-                    onClick={() => onDispute(booking)}
-                    className="text-[10px] font-black uppercase border-b-2 border-black hover:text-gray-500 hover:border-gray-500 transition-colors text-gray-400"
-                  >
-                    Report
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

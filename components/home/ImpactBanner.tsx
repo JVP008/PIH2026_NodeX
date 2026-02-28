@@ -1,103 +1,68 @@
-import Link from "next/link";
+'use client';
+
+const stats = [
+    { icon: '🏠', number: '₹1.2L Cr', label: 'Market Size in India', color: 'bg-indigo-300' },
+    { icon: '😟', number: '90%', label: 'Services Are Unorganized', color: 'bg-rose-300' },
+    { icon: '🌆', number: '50+ Cities', label: 'Cities Covered', color: 'bg-emerald-300' },
+    { icon: '⚡', number: '<2 Hours', label: 'Average Response Time', color: 'bg-amber-300' },
+];
 
 export default function ImpactBanner() {
-  return (
-    <section className="py-20 px-4 bg-white border-b-4 border-black relative overflow-hidden">
-      {/* Background creative elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply opacity-50 blur-3xl animate-blob"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-100 rounded-full mix-blend-multiply opacity-50 blur-3xl animate-blob animation-delay-4000"></div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <span className="bg-yellow-300 border-2 border-black text-black font-black px-4 py-1 rounded-full text-sm shadow-[2px_2px_0px_0px_#000] inline-block mb-4">
-            🚀 The Bharat Opportunity
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-black mb-4">
-            Empowering India&apos;s Local Economy
-          </h2>
-          <p className="text-xl text-gray-700 font-medium max-w-3xl mx-auto">
-            HouseConnect Pro is bringing structure to India&apos;s massive
-            unorganized home services sector, creating value for both homeowners
-            and skilled professionals.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Stat Card 1 */}
-          <div className="bg-white border-4 border-black p-8 rounded-xl shadow-[8px_8px_0px_0px_#000] hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#000] transition-all relative group">
-            <div className="absolute -top-6 -right-6 w-16 h-16 bg-blue-400 border-3 border-black rounded-full flex items-center justify-center text-3xl shadow-[4px_4px_0px_0px_#000] group-hover:rotate-12 transition-transform z-10">
-              🏘️
+    return (
+        <section className="relative py-20 px-4 bg-[#fdfbf8] overflow-hidden border-y-8 border-yellow-300">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-30 pointer-events-none">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+                <div className="absolute top-10 right-10 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+                <div className="absolute -bottom-8 left-1/2 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
             </div>
-            <h3 className="text-5xl font-black mb-2 text-black">$30B+</h3>
-            <p className="font-bold text-gray-600 uppercase tracking-widest text-sm mb-4">
-              Market Size
-            </p>
-            <p className="text-gray-700 font-medium">
-              India&apos;s home services market is rapidly expanding, driven by
-              urbanization and rising disposable incomes across Tier 1 & 2
-              cities.
-            </p>
-          </div>
 
-          {/* Stat Card 2 */}
-          <div className="bg-white border-4 border-black p-8 rounded-xl shadow-[8px_8px_0px_0px_#000] hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#000] transition-all relative group mt-8 md:mt-0">
-            <div className="absolute -top-6 -right-6 w-16 h-16 bg-green-400 border-3 border-black rounded-full flex items-center justify-center text-3xl shadow-[4px_4px_0px_0px_#000] group-hover:rotate-12 transition-transform z-10">
-              📈
+            <div className="relative max-w-7xl mx-auto z-10">
+                <div className="text-center mb-12">
+                    <div className="inline-block transform -rotate-2 mb-6">
+                        <span className="bg-yellow-300 text-black px-6 py-2 text-xl font-black uppercase tracking-wider border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                            The Bharat Opportunity
+                        </span>
+                    </div>
+                    <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight text-black mb-6 leading-none">
+                        Fixing India&apos;s <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600">
+                            Broken Services
+                        </span>
+                    </h2>
+                    <p className="font-bold text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                        The home services sector is massive, chaotic, and completely unorganized. We&apos;re bringing transparency, speed, and trust — one verified booking at a time.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 px-4">
+                    {stats.map((s, i) => (
+                        <div
+                            key={i}
+                            className={`group relative bg-white border-4 border-black rounded-2xl p-6 text-center shadow-[8px_8px_0px_0px_#000000] hover:-translate-y-2 hover:translate-x-2 hover:shadow-none transition-all duration-300 cursor-default`}
+                        >
+                            <div className={`absolute -top-6 -right-6 w-16 h-16 ${s.color} border-4 border-black rounded-full flex items-center justify-center text-3xl shadow-[4px_4px_0px_0px_#000] rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10`}>
+                                {s.icon}
+                            </div>
+                            <div className="pt-4">
+                                <div className="text-4xl md:text-5xl font-black text-black mb-2 tracking-tighter">
+                                    {s.number}
+                                </div>
+                                <div className="text-base font-bold text-gray-500 uppercase tracking-wide">
+                                    {s.label}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-16 text-center">
+                    <p className="inline-block bg-white border-2 border-black text-black shadow-[4px_4px_0px_0px_#000] px-8 py-3 rounded-full text-sm font-bold tracking-wide">
+                        Trusted by 10,000+ homeowners across Mumbai, Delhi, Bengaluru, Chennai, & Hyderabad.
+                    </p>
+                </div>
             </div>
-            <h3 className="text-5xl font-black mb-2 text-black">&gt;85%</h3>
-            <p className="font-bold text-gray-600 uppercase tracking-widest text-sm mb-4">
-              Unorganized Sector
-            </p>
-            <p className="text-gray-700 font-medium">
-              The vast majority of the market relies on word-of-mouth. We
-              provide a trusted digital infrastructure to formalize these
-              services.
-            </p>
-          </div>
-
-          {/* Stat Card 3 */}
-          <div className="bg-white border-4 border-black p-8 rounded-xl shadow-[8px_8px_0px_0px_#000] hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_#000] transition-all relative group mt-8 md:mt-0">
-            <div className="absolute -top-6 -right-6 w-16 h-16 bg-pink-400 border-3 border-black rounded-full flex items-center justify-center text-3xl shadow-[4px_4px_0px_0px_#000] group-hover:rotate-12 transition-transform z-10">
-              🤝
-            </div>
-            <h3 className="text-5xl font-black mb-2 text-black">100k+</h3>
-            <p className="font-bold text-gray-600 uppercase tracking-widest text-sm mb-4">
-              Pros Empowered
-            </p>
-            <p className="text-gray-700 font-medium">
-              By connecting skilled workers directly with demand, we help them
-              increase earnings by up to 40% while ensuring transparent pricing.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-16 bg-yellow-50 border-4 border-black p-8 rounded-xl shadow-[6px_6px_0px_0px_#000] flex flex-col md:flex-row items-center justify-between">
-          <div>
-            <h4 className="text-2xl font-black uppercase mb-2">
-              Join the Revolution
-            </h4>
-            <p className="text-gray-700 font-medium max-w-xl">
-              Whether you&apos;re a homeowner looking for reliable help or a
-              skilled professional seeking consistent work, HouseConnect is your
-              platform.
-            </p>
-          </div>
-          <div className="mt-6 md:mt-0 flex gap-4">
-            <Link
-              href="/post-job"
-              className="bg-black text-white px-6 py-3 font-bold border-2 border-black hover:bg-gray-800 transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] text-center"
-            >
-              List Service
-            </Link>
-            <Link
-              href="/contractors"
-              className="bg-white text-black px-6 py-3 font-bold border-2 border-black hover:bg-gray-100 transition-colors shadow-[4px_4px_0px_0px_#000] text-center"
-            >
-              Find pros
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    );
 }
+
