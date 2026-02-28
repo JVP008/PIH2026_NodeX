@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
         const { data, error: fetchError } = await supabase
             .from('bookings')
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
         if (fetchError) throw fetchError;
 
         return NextResponse.json({ data });
-    } catch (_error) {
+    } catch {
         return NextResponse.json({ error: 'Error fetching bookings' }, { status: 500 });
     }
 }
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         if (createError) throw createError;
 
         return NextResponse.json({ data });
-    } catch (_error) {
+    } catch {
         return NextResponse.json({ error: 'Error creating booking' }, { status: 500 });
     }
 }

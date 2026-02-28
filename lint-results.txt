@@ -1,0 +1,40 @@
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\bookings\route.ts
+   6:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+  16:14  warning  '_error' is defined but never used   @typescript-eslint/no-unused-vars
+  32:14  warning  '_error' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\contractors\route.ts
+  22:14  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\disputes\route.ts
+   6:27  warning  '_request' is defined but never used  @typescript-eslint/no-unused-vars
+  15:14  warning  '_error' is defined but never used    @typescript-eslint/no-unused-vars
+  31:14  warning  '_error' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\jobs\route.ts
+  17:14  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\bookings\page.tsx
+  23:12  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\NavBar.tsx
+  17:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\NavBar.tsx:17:13
+  15 |         // Read guest flag instantly from localStorage — no network call
+  16 |         if (typeof window !== 'undefined') {
+> 17 |             setIsGuest(localStorage.getItem('isGuest') === 'true');
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |         }
+  19 |
+  20 |         // Auth state listener — fires immediately with cached session, no network hang  react-hooks/set-state-in-effect
+
+✖ 10 problems (1 error, 9 warnings)
+

@@ -9,6 +9,13 @@
   /* Pinkish red */
   --accent-3: #4ECDC4;
   /* Teal */
+
+  /* Pastel palette from new design */
+  --pastel-yellow: #FEF08A;
+  --pastel-pink: #FBCFE8;
+  --pastel-green: #BBF7D0;
+  --pastel-blue: #BAE6FD;
+  --pastel-emerald: #A7F3D0;
 }
 
 @theme inline {
@@ -17,12 +24,17 @@
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
   --color-accent-3: var(--accent-3);
+  --color-pastel-yellow: var(--pastel-yellow);
+  --color-pastel-pink: var(--pastel-pink);
+  --color-pastel-green: var(--pastel-green);
+  --color-pastel-blue: var(--pastel-blue);
+  --color-pastel-emerald: var(--pastel-emerald);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 /* Neo Brutalist Components */

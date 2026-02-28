@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BookingCard from '@/components/bookings/BookingCard';
 import { supabase } from '@/lib/supabaseClient';
-import type { User } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/Toast';
 import Modal from '@/components/ui/Modal';
 import { Booking } from '@/types';
@@ -20,7 +19,6 @@ export default function BookingsPage() {
     const [cvv, setCvv] = useState('');
     const { showToast } = useToast();
 
-    const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
 
     const fetchBookings = async () => {
@@ -42,7 +40,6 @@ export default function BookingsPage() {
                 router.push('/login');
                 return;
             }
-            setUser(user);
             fetchBookings();
         };
         checkAuth();
@@ -92,8 +89,8 @@ export default function BookingsPage() {
                         key={f}
                         onClick={() => setFilter(f)}
                         className={`px-6 py-3 border-[3px] border-black text-xs font-black uppercase tracking-widest transition-all ${filter === f
-                                ? 'bg-black text-white neo-shadow-small translate-y-1'
-                                : 'bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:-translate-y-1'
+                            ? 'bg-black text-white neo-shadow-small translate-y-1'
+                            : 'bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:-translate-y-1'
                             }`}
                     >
                         {f === 'pending' ? 'Unpaid' : f}

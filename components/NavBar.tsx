@@ -12,9 +12,12 @@ export default function NavBar() {
     const [isGuest, setIsGuest] = useState(false);
 
     useEffect(() => {
-        // Read guest flag instantly from localStorage — no network call
+        // Read guest flag from localStorage — avoid synchronous setState in effect
         if (typeof window !== 'undefined') {
-            setIsGuest(localStorage.getItem('isGuest') === 'true');
+            const guestStatus = localStorage.getItem('isGuest') === 'true';
+            if (guestStatus) {
+                setTimeout(() => setIsGuest(true), 0);
+            }
         }
 
         // Auth state listener — fires immediately with cached session, no network hang
@@ -44,28 +47,32 @@ export default function NavBar() {
     };
 
     return (
-        <nav className="bg-[#FFD700] text-black border-b-[4px] border-black sticky top-0 z-50">
+        <nav className="bg-white text-black border-b-[4px] border-black relative z-50">
             <div className="max-w-7xl mx-auto px-4 py-3">
                 <div className="flex items-center justify-between">
-                    <Link href="/" className="flex items-center space-x-2 cursor-pointer hover:translate-x-1 transition">
-                        <i className="fas fa-home text-2xl"></i>
-                        <span className="text-2xl font-black uppercase tracking-tighter">Houseconnect Pro</span>
+                    {/* Logo Area */}
+                    <Link href="/" className="flex items-center space-x-2 cursor-pointer hover:translate-x-1 transition group">
+                        <div className="w-8 h-8 rounded-full bg-[#FFD700] border-2 border-black flex items-center justify-center neo-shadow-small group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] group-hover:shadow-[3px_3px_0px_#000]">
+                            <i className="fas fa-home text-sm"></i>
+                        </div>
+                        <span className="text-xl font-black tracking-tight">HouseConnect <span className="text-gray-500">Pro</span></span>
                     </Link>
 
-                    <div className="hidden md:flex items-center space-x-2">
+                    {/* Centered Links */}
+                    <div className="hidden md:flex items-center space-x-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                         {[
                             { name: 'Home', path: '/' },
-                            { name: 'Services', path: '/post-job' },
+                            { name: 'Post a Job', path: '/post-job' },
                             { name: 'Find Pros', path: '/contractors' },
-                            { name: 'Bookings', path: '/bookings' },
+                            { name: 'My Bookings', path: '/bookings' },
                             { name: 'Support', path: '/disputes' },
                         ].map((link) => (
                             <Link
                                 key={link.path}
                                 href={link.path}
-                                className={`px-3 py-1.5 font-bold uppercase text-xs tracking-widest border-2 border-transparent transition-all ${isActive(link.path)
-                                        ? 'bg-black text-[#FFD700] border-black scale-105'
-                                        : 'hover:border-black'
+                                className={`text-sm font-bold tracking-tight transition-all hover:opacity-70 ${isActive(link.path)
+                                    ? 'text-blue-600 border-b-2 border-blue-600'
+                                    : ''
                                     }`}
                             >
                                 {link.name}
@@ -73,25 +80,30 @@ export default function NavBar() {
                         ))}
                     </div>
 
+                    {/* User Actions */}
                     <div className="flex items-center space-x-4">
                         {userEmail ? (
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs font-black uppercase">Hi, {userEmail.split('@')[0]}</span>
+                            <div className="flex items-center gap-3 border-2 border-black rounded-full px-1 py-1 pr-4 neo-shadow bg-[#BAE6FD] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] transition-all">
+                                <span className="bg-white border-2 border-black rounded-full w-8 h-8 flex items-center justify-center font-black text-sm">
+                                    {userEmail[0].toUpperCase()}
+                                </span>
+                                <span className="text-xs font-bold">{userEmail.split('@')[0]}</span>
                                 <button
                                     onClick={handleLogout}
-                                    className="bg-white border-2 border-black px-3 py-1.5 text-xs font-black uppercase neo-shadow transition-all hover:bg-red-400 hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none"
+                                    className="text-[10px] font-black uppercase hover:text-red-500 ml-2 border-l-2 border-black pl-2"
                                 >
                                     Logout
                                 </button>
                             </div>
                         ) : isGuest ? (
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs font-black uppercase flex items-center gap-1">
-                                    <i className="fas fa-user-secret"></i> Guest
+                            <div className="flex items-center gap-3 border-2 border-black rounded-full px-1 py-1 pr-4 neo-shadow bg-[#BBF7D0] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] transition-all">
+                                <span className="bg-white border-2 border-black w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                                    <i className="fas fa-user-secret"></i>
                                 </span>
+                                <span className="text-xs font-bold">Guest</span>
                                 <button
                                     onClick={handleExitGuest}
-                                    className="bg-[#4ECDC4] border-2 border-black px-3 py-1.5 text-xs font-black uppercase neo-shadow hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none"
+                                    className="text-[10px] font-black uppercase hover:text-red-500 ml-2 border-l-2 border-black pl-2"
                                 >
                                     Login
                                 </button>
@@ -99,7 +111,7 @@ export default function NavBar() {
                         ) : (
                             <Link
                                 href="/login"
-                                className="bg-[#FF6B6B] border-2 border-black px-6 py-2 text-sm font-black uppercase neo-shadow hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 active:shadow-none"
+                                className="bg-[#FFD700] border-2 border-black px-6 py-2 rounded-full text-sm font-black uppercase neo-shadow hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
                             >
                                 Login
                             </Link>

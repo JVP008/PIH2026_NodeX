@@ -1,23 +1,26 @@
 const STATIC_STATS = [
-    { value: '50+', label: 'Verified Pros', color: 'bg-blue-400', delay: 'fade-up-delay-1' },
-    { value: '98%', label: 'Satisfaction', color: 'bg-green-400', delay: 'fade-up-delay-2' },
-    { value: '1,200+', label: 'Jobs Posted', color: 'bg-purple-400', delay: 'fade-up-delay-3' },
-    { value: '4.8', label: 'Avg Rating', color: 'bg-orange-400', delay: 'fade-up-delay-4' },
+    { value: '1540+', label: 'VERIFIED PROS', color: 'bg-[#FBCFE8]' },
+    { value: '98%', label: 'SATISFACTION', color: 'bg-[#BBF7D0]' },
+    { value: '8930+', label: 'JOBS POSTED', color: 'bg-[#BAE6FD]' },
+    { value: '4.8', label: 'AVG RATING', color: 'bg-[#FEF08A]' },
 ];
 
 export default function Stats() {
     return (
-        <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {STATIC_STATS.map(({ value, label, color, delay }) => (
+        <div className="relative max-w-5xl mx-auto px-4 -mt-16 z-20">
+            {/* The continuous yellow line behind the stats box */}
+            <div className="absolute top-1/2 left-0 w-full h-[3px] bg-[#FFD700] -translate-y-1/2 -z-10 hidden md:block"></div>
+
+            <div className="bg-white border-[4px] border-black rounded-lg p-3 custom-shadow flex flex-col md:flex-row gap-3 shadow-[8px_8px_0px_#000]">
+                {STATIC_STATS.map(({ value, label, color }) => (
                     <div
                         key={label}
-                        className={`${color} border-[4px] border-black p-6 text-center neo-shadow-large ${delay} hover:-translate-y-1 hover:-translate-x-1 transition-transform cursor-default group`}
+                        className={`${color} flex-1 border-[3px] border-black rounded-md py-6 px-4 text-center hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#000] transition-all cursor-default relative overflow-hidden`}
                     >
-                        <div className="text-4xl md:text-5xl font-black text-black leading-tight drop-shadow-[2px_2px_0_white]">
+                        <div className="text-3xl md:text-4xl font-black text-black tracking-tight mb-1">
                             {value}
                         </div>
-                        <div className="text-xs uppercase font-black text-black mt-2 tracking-widest bg-white border-2 border-black px-2 py-1 rotate-1 group-hover:rotate-0 transition-transform inline-block">
+                        <div className="text-[10px] md:text-xs font-black text-black uppercase tracking-widest opacity-80">
                             {label}
                         </div>
                     </div>
