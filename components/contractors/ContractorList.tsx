@@ -13,8 +13,85 @@ interface ContractorListProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+const DUMMY_CONTRACTORS: Contractor[] = [
+    {
+        id: 1, name: 'Rajesh Sharma', service: 'Plumbing',
+        rating: 4.9, reviews: 142, price: '₹450/hr',
+        image: '🪠', available: true, verified: true,
+        location: 'Bhandara, Maharashtra',
+        response_time: '~30 min', completed_jobs: 318,
+        description: '12+ years fixing leaks, pipe fittings, and bathroom installations. Available on weekends too.',
+        created_at: '2024-01-01'
+    },
+    {
+        id: 2, name: 'Suresh Patil', service: 'Electrical',
+        rating: 4.8, reviews: 98, price: '₹500/hr',
+        image: '⚡', available: true, verified: true,
+        location: 'Nagpur, Maharashtra',
+        response_time: '~1 hr', completed_jobs: 210,
+        description: 'Licensed electrician. Expert in home wiring, MCB panels, inverter installation, and safety audits.',
+        created_at: '2024-01-02'
+    },
+    {
+        id: 3, name: 'Priya Meshram', service: 'Cleaning',
+        rating: 4.7, reviews: 204, price: '₹300/hr',
+        image: '🧹', available: true, verified: true,
+        location: 'Sakoli, Maharashtra',
+        response_time: '~2 hr', completed_jobs: 430,
+        description: 'Deep cleaning, post-construction cleanup, and regular housekeeping. Brings own supplies.',
+        created_at: '2024-01-03'
+    },
+    {
+        id: 4, name: 'Anil Bhoyar', service: 'HVAC',
+        rating: 4.6, reviews: 76, price: '₹600/hr',
+        image: '❄️', available: false, verified: true,
+        location: 'Gondia, Maharashtra',
+        response_time: '~3 hr', completed_jobs: 155,
+        description: 'AC installation, servicing and gas refill. All major brands supported. 1-year service warranty.',
+        created_at: '2024-01-04'
+    },
+    {
+        id: 5, name: 'Vikram Uikey', service: 'Painting',
+        rating: 4.8, reviews: 88, price: '₹380/hr',
+        image: '🎨', available: true, verified: false,
+        location: 'Bhandara, Maharashtra',
+        response_time: '~2 hr', completed_jobs: 180,
+        description: 'Interior and exterior painting. Waterproof coating, texture finish, and enamel work available.',
+        created_at: '2024-01-05'
+    },
+    {
+        id: 6, name: 'Dinesh Kurre', service: 'Landscaping',
+        rating: 4.5, reviews: 54, price: '₹350/hr',
+        image: '🌿', available: true, verified: false,
+        location: 'Tumsar, Maharashtra',
+        response_time: '~4 hr', completed_jobs: 90,
+        description: 'Garden design, lawn maintenance, tree trimming, and drip irrigation setup.',
+        created_at: '2024-01-06'
+    },
+    {
+        id: 7, name: 'Manoj Thakre', service: 'Carpentry',
+        rating: 4.9, reviews: 116, price: '₹520/hr',
+        image: '🪚', available: true, verified: true,
+        location: 'Nagpur, Maharashtra',
+        response_time: '~2 hr', completed_jobs: 267,
+        description: 'Custom furniture, door/window fitting, modular kitchen cabinets, and wooden flooring.',
+        created_at: '2024-01-07'
+    },
+    {
+        id: 8, name: 'Ravi Lilhare', service: 'Electrical',
+        rating: 4.4, reviews: 43, price: '₹420/hr',
+        image: '🔌', available: true, verified: false,
+        location: 'Sakoli, Maharashtra',
+        response_time: '~1 hr', completed_jobs: 82,
+        description: 'Fan and light installation, socket repairs, earthing and CCTV power setup.',
+        created_at: '2024-01-08'
+    },
+];
+
 export default function ContractorList({ initialContractors }: ContractorListProps) {
-    const [contractors, setContractors] = useState<Contractor[]>(initialContractors);
+    const seed = initialContractors.length > 0 ? initialContractors : DUMMY_CONTRACTORS;
+    const [contractors, setContractors] = useState<Contractor[]>(seed);
     const [filters, setFilters] = useState({
         service: '',
         rating: 0,
@@ -34,8 +111,7 @@ export default function ContractorList({ initialContractors }: ContractorListPro
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
 
-        // Client-side filtering for now, could be server-side
-        const filtered = initialContractors.filter(c => {
+        const filtered = seed.filter(c => {
             if (newFilters.service && c.service !== newFilters.service) return false;
             if (c.rating < newFilters.rating) return false;
             if (newFilters.available && !c.available) return false;
@@ -47,7 +123,7 @@ export default function ContractorList({ initialContractors }: ContractorListPro
 
     const resetFilters = () => {
         setFilters({ service: '', rating: 0, available: false, verified: false });
-        setContractors(initialContractors);
+        setContractors(seed);
     };
 
     const handleBook = (contractor: Contractor) => {
