@@ -8,7 +8,7 @@ export default function DisputeCard({ dispute }: { dispute: Dispute }) {
             <div className="space-y-1">
                 <h4 className="font-black uppercase text-sm tracking-tight border-b-2 border-black/10 pb-1 flex items-center gap-2">
                     <span className="w-2 h-2 bg-black" />
-                    {dispute.booking?.service || 'SERVICE'} — {dispute.booking?.contractor?.name || 'CONTRACTOR'}
+                    {dispute.booking?.contractor?.service || 'SERVICE'} — {dispute.booking?.contractor?.name || 'CONTRACTOR'}
                 </h4>
                 <div className="flex gap-4 pt-1">
                     <p className="text-[10px] font-black uppercase tracking-widest opacity-60">

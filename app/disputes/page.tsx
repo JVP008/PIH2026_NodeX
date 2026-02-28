@@ -22,12 +22,12 @@ export default function DisputesPage() {
     const fetchData = useCallback(async () => {
         const { data: disputesData } = await supabase
             .from('disputes')
-            .select('*, booking:bookings(service, contractor:contractors(name))');
+            .select('*, booking:bookings(contractor:contractors(name, service))');
         setDisputes(disputesData || []);
 
         const { data: bookingsData } = await supabase
             .from('bookings')
-            .select('*, contractor:contractors(name)')
+            .select('*, contractor:contractors(name, service)')
             .in('status', ['completed', 'upcoming']);
         setBookings(bookingsData || []);
     }, []);
@@ -124,7 +124,7 @@ export default function DisputesPage() {
                                     <option value="">SELECT LOG ENTRY</option>
                                     {bookings.map((b: Booking) => (
                                         <option key={b.id} value={b.id}>
-                                            {b.service || 'SERVICE'} - {b.contractor?.name} ({b.date})
+                                            {b.contractor?.service || 'SERVICE'} - {b.contractor?.name} ({b.date})
                                         </option>
                                     ))}
                                 </select>

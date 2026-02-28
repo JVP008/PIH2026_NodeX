@@ -14,7 +14,7 @@ interface ContractorListProps {
 
 const DUMMY_CONTRACTORS: Contractor[] = [
     {
-        id: 1, name: 'Rajesh Sharma', service: 'Plumbing',
+        id: '11111111-1111-1111-1111-111111111111', name: 'Rajesh Sharma', service: 'Plumbing',
         rating: 4.9, reviews: 142, price: '₹450/hr',
         image: '🪠', available: true, verified: true,
         location: 'Bhandara, Maharashtra',
@@ -23,7 +23,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-01'
     },
     {
-        id: 2, name: 'Suresh Patil', service: 'Electrical',
+        id: '22222222-2222-2222-2222-222222222222', name: 'Suresh Patil', service: 'Electrical',
         rating: 4.8, reviews: 98, price: '₹500/hr',
         image: '⚡', available: true, verified: true,
         location: 'Nagpur, Maharashtra',
@@ -32,7 +32,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-02'
     },
     {
-        id: 3, name: 'Priya Meshram', service: 'Cleaning',
+        id: '33333333-3333-3333-3333-333333333333', name: 'Priya Meshram', service: 'Cleaning',
         rating: 4.7, reviews: 204, price: '₹300/hr',
         image: '🧹', available: true, verified: true,
         location: 'Sakoli, Maharashtra',
@@ -41,7 +41,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-03'
     },
     {
-        id: 4, name: 'Anil Bhoyar', service: 'HVAC',
+        id: '44444444-4444-4444-4444-444444444444', name: 'Anil Bhoyar', service: 'HVAC',
         rating: 4.6, reviews: 76, price: '₹600/hr',
         image: '❄️', available: false, verified: true,
         location: 'Gondia, Maharashtra',
@@ -50,7 +50,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-04'
     },
     {
-        id: 5, name: 'Vikram Uikey', service: 'Painting',
+        id: '55555555-5555-5555-5555-555555555555', name: 'Vikram Uikey', service: 'Painting',
         rating: 4.8, reviews: 88, price: '₹380/hr',
         image: '🎨', available: true, verified: false,
         location: 'Bhandara, Maharashtra',
@@ -59,7 +59,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-05'
     },
     {
-        id: 6, name: 'Dinesh Kurre', service: 'Landscaping',
+        id: '66666666-6666-6666-6666-666666666666', name: 'Dinesh Kurre', service: 'Landscaping',
         rating: 4.5, reviews: 54, price: '₹350/hr',
         image: '🌿', available: true, verified: false,
         location: 'Tumsar, Maharashtra',
@@ -68,7 +68,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-06'
     },
     {
-        id: 7, name: 'Manoj Thakre', service: 'Carpentry',
+        id: '77777777-7777-7777-7777-777777777777', name: 'Manoj Thakre', service: 'Carpentry',
         rating: 4.9, reviews: 116, price: '₹520/hr',
         image: '🪚', available: true, verified: true,
         location: 'Nagpur, Maharashtra',
@@ -77,7 +77,7 @@ const DUMMY_CONTRACTORS: Contractor[] = [
         created_at: '2024-01-07'
     },
     {
-        id: 8, name: 'Ravi Lilhare', service: 'Electrical',
+        id: '88888888-8888-8888-8888-888888888888', name: 'Ravi Lilhare', service: 'Electrical',
         rating: 4.4, reviews: 43, price: '₹420/hr',
         image: '🔌', available: true, verified: false,
         location: 'Sakoli, Maharashtra',
@@ -111,7 +111,9 @@ export default function ContractorList({ initialContractors }: ContractorListPro
 
         const filtered = seed.filter(c => {
             if (newFilters.service && c.service !== newFilters.service) return false;
-            if (c.rating < newFilters.rating) return false;
+            // Handle null ratings safely
+            const r = c.rating ?? 0;
+            if (r < newFilters.rating) return false;
             if (newFilters.available && !c.available) return false;
             if (newFilters.verified && !c.verified) return false;
             return true;
@@ -278,8 +280,8 @@ export default function ContractorList({ initialContractors }: ContractorListPro
                                     key={slot}
                                     onClick={() => setBookingTime(slot)}
                                     className={`p-3 text-[10px] font-black uppercase border-[3px] border-black transition-all ${bookingTime === slot
-                                            ? 'bg-black text-white translate-y-1 shadow-none'
-                                            : 'bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:translate-y-[-1px]'
+                                        ? 'bg-black text-white translate-y-1 shadow-none'
+                                        : 'bg-white text-black neo-shadow-small hover:bg-yellow-100 hover:translate-y-[-1px]'
                                         }`}
                                 >
                                     {slot}

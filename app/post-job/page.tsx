@@ -52,11 +52,10 @@ function PostJobContent() {
                 .insert([{
                     name: formData.name,
                     service: formData.service,
-                    description: formData.description,
+                    description: `${formData.description}\nExperience: ${formData.experience} years. Availability: ${formData.availability}.`,
                     location: formData.location,
-                    availability: formData.availability,
+                    available: true,
                     price: formData.rate ? `₹${formData.rate}/hr` : null,
-                    experience: formData.experience,
                     rating: 0,
                     reviews: 0,
                 }]);

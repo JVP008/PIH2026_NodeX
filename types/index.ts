@@ -7,15 +7,16 @@ export interface Booking extends Omit<Database['public']['Tables']['bookings']['
     contractor?: {
         name: string;
         image: string | null;
+        service?: string;
     };
     service?: string;
 }
 
 export type Dispute = Database['public']['Tables']['disputes']['Row'] & {
     booking?: {
-        service: string;
         contractor?: {
             name: string;
+            service?: string;
         };
     };
 };
