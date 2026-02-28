@@ -148,13 +148,19 @@ export default function ContractorList({ initialContractors }: ContractorListPro
             {/* Contractor List */}
             <div className="flex-1">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold">Available Contractors</h2>
-                    <span className="text-gray-500">{contractors.length} pros found</span>
+                    <h2 className="text-2xl font-bold">Find Pros Near You</h2>
+                    <span className="text-gray-500">{contractors.length} pro{contractors.length !== 1 ? 's' : ''} found</span>
                 </div>
                 <div className="grid gap-6">
-                    {contractors.map((c) => (
+                    {contractors.length > 0 ? contractors.map((c) => (
                         <ContractorCard key={c.id} contractor={c} onBook={handleBook} />
-                    ))}
+                    )) : (
+                        <div className="text-center py-16 bg-white rounded-xl shadow-md">
+                            <i className="fas fa-hard-hat text-5xl text-gray-300 mb-4"></i>
+                            <h3 className="text-lg font-semibold text-gray-500 mb-2">No pros found</h3>
+                            <p className="text-gray-400 text-sm">Try changing your filters, or check back later as new professionals join.</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

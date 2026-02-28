@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/ui/Toast";
 
 const geistSans = Geist({
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "House Connect Bro - Find Trusted Local Contractors",
-  description: "AI-powered matching connects you with the best-rated local contractors based on your specific needs.",
+  title: "Houseconnect Pro - Find Trusted Local Contractors",
+  description: "Houseconnect Pro connects skilled professionals with homeowners across India. Find the right pro for any job, fast.",
 };
 
 export default function RootLayout({
@@ -35,6 +36,7 @@ export default function RootLayout({
         <ToastProvider>
           <NavBar />
           {children}
+          <Footer />
         </ToastProvider>
       </body>
     </html>
