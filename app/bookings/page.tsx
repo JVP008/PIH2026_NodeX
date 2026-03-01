@@ -63,24 +63,11 @@ export default function BookingsPage() {
     // Show loading placeholders while data is being requested.
     setLoading(true);
     try {
-      // Read signed-in user so bookings can be filtered by that account.
-      const user = (await supabase.auth.getUser()).data.user;
-
-      // Show both user-specific and guest bookings (user_id is null) for a better demo experience.
-      let query = supabase
+      // Always fetch all bookings for this demo so everyone can see the results of their actions.
+      const { data, error } = await supabase
         .from('bookings')
         .select('*, contractor:contractors(name, image, service)')
         .order('created_at', { ascending: false });
-
-      if (user) {
-        // Show bookings for this user OR guest bookings
-        query = query.or(`user_id.eq.${user.id},user_id.is.null`);
-      } else {
-        // Show only guest bookings if not logged in
-        query = query.is('user_id', null);
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         throw error;
@@ -173,12 +160,31 @@ export default function BookingsPage() {
     }
 
     try {
-      // 1. Refresh availability based on current upcoming/pending slots
+      // 1. Refresh availability based on current upcoming/pending slots.
       await refreshContractorAvailability(selectedBooking.contractor_id);
 
-      // 2. Increment the completed_jobs count for the professional
+      // 2. Increment completed job count without requiring custom DB RPC.
       if (selectedBooking.contractor_id) {
-        await supabase.rpc('increment_completed_jobs', { row_id: selectedBooking.contractor_id });
+        const { data: contractorData, error: contractorFetchError } = await supabase
+          .from('contractors')
+          .select('completed_jobs')
+          .eq('id', selectedBooking.contractor_id)
+          .single();
+
+        if (contractorFetchError) {
+          throw contractorFetchError;
+        }
+
+        const currentCompletedJobs = Number(contractorData?.completed_jobs || 0);
+
+        const { error: contractorUpdateError } = await supabase
+          .from('contractors')
+          .update({ completed_jobs: currentCompletedJobs + 1 })
+          .eq('id', selectedBooking.contractor_id);
+
+        if (contractorUpdateError) {
+          throw contractorUpdateError;
+        }
       }
     } catch (err) {
       console.error('Post-payment update error:', err);

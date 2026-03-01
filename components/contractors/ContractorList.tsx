@@ -154,44 +154,22 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
       // Read signed-in user so booking can be linked to that account.
       const user = (await supabase.auth.getUser()).data.user;
 
-      // Check if this timeslot is already booked to prevent duplicates
-      const { data: existingBookings } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('contractor_id', contractorId)
-        .eq('date', bookingDate)
-        .eq('time', bookingTime);
-
-      if (existingBookings && existingBookings.length > 0) {
-        showToast('This professional is already booked for this specific time slot.', 'error');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Save booking into database.
-      const { error: bookingError } = await supabase.from('bookings').insert([
-        {
+      const bookingResponse = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           contractor_id: contractorId,
           date: bookingDate,
           time: bookingTime,
           status: 'upcoming',
-          price: parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, '')) || 500,
+          price: Number.parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, ''), 10) || 500,
           user_id: user?.id || null,
-        },
-      ]);
+        }),
+      });
 
-      if (bookingError) {
-        throw bookingError;
-      }
-
-      // Mark this contractor as busy once a booking is confirmed.
-      const { error: availabilityError } = await supabase
-        .from('contractors')
-        .update({ available: false })
-        .eq('id', contractorId);
-
-      if (availabilityError) {
-        throw availabilityError;
+      const bookingResult = await bookingResponse.json();
+      if (!bookingResponse.ok) {
+        throw new Error(bookingResult.error || 'Failed to create booking');
       }
 
       // Update list state immediately so the badge/button reflect latest availability.

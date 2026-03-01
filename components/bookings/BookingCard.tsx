@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 /**
  * BookingCard Component
  *
@@ -83,12 +81,12 @@ export default function BookingCard({
               >
                 Rate & Review
               </button>
-              <Link
-                href="/disputes"
+              <button
+                onClick={() => onReport?.({ id: booking.id })}
                 className="px-3 py-1 bg-orange-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
               >
                 Report
-              </Link>
+              </button>
             </>
           )}
         </div>

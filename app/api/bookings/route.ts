@@ -75,6 +75,28 @@ export async function POST(request: Request) {
       user_id: isNonEmptyString(user_id) ? user_id : null,
     };
 
+    // Prevent double-booking the same professional for the same date/time
+    // while allowing re-booking when previous slots were cancelled/completed.
+    const { data: existingSlots, error: existingSlotError } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('contractor_id', Number(parsedContractorId))
+      .eq('date', date.trim())
+      .eq('time', time.trim())
+      .in('status', ['upcoming', 'pending'])
+      .limit(1);
+
+    if (existingSlotError) {
+      throw existingSlotError;
+    }
+
+    if (existingSlots && existingSlots.length > 0) {
+      return NextResponse.json(
+        { error: 'This professional is already booked for this date and time.' },
+        { status: 409 }
+      );
+    }
+
     // Insert booking and return created row.
     const { data, error: createError } = await supabase
       .from('bookings')
@@ -82,6 +104,18 @@ export async function POST(request: Request) {
       .select();
 
     if (createError) throw createError;
+
+    // Mark the professional busy after a successful active booking.
+    if (insertPayload.status === 'upcoming' || insertPayload.status === 'pending') {
+      const { error: availabilityError } = await supabase
+        .from('contractors')
+        .update({ available: false })
+        .eq('id', Number(parsedContractorId));
+
+      if (availabilityError) {
+        throw availabilityError;
+      }
+    }
 
     return NextResponse.json({ data });
   } catch {
