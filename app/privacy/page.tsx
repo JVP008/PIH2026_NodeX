@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Static page that explains what user data is collected and how it is used.
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-blue-50 py-16 px-4 sm:px-6 lg:px-8">

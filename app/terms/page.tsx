@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Static page describing expected behavior and platform responsibilities.
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">

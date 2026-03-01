@@ -12,8 +12,17 @@ export default async function ContractorsPage() {
   try {
     const { data } = await supabase.from('contractors').select('*');
     if (data && data.length > 0) {
-      // If the database has data, ALWAYS use it exclusively so foreign key IDs match for Bookings
-      contractors = data;
+      // Deduplicate by name (case-insensitive and trimmed)
+      const uniqueNames = new Set();
+      const deduplicated = [];
+      for (const req of data) {
+        const nameKey = (req.name || '').toLowerCase().trim();
+        if (!uniqueNames.has(nameKey)) {
+          uniqueNames.add(nameKey);
+          deduplicated.push(req);
+        }
+      }
+      contractors = deduplicated;
     }
   } catch {
     // Supabase unavailable — fallback to seed data

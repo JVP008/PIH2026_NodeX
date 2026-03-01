@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Static page explaining why HouseConnect exists and what trust promises we make.
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-pink-50 py-16 px-4 sm:px-6 lg:px-8">

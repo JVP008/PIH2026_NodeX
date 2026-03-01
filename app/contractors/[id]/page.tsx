@@ -10,8 +10,10 @@ export default async function ContractorDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Route parameter contains the contractor id selected by the user.
   const { id } = await params;
 
+  // Prefer live database record; seed fallback keeps page functional in demo mode.
   const { data: dbContractor } = await supabase
     .from('contractors')
     .select('*')
@@ -21,6 +23,7 @@ export default async function ContractorDetailPage({
   const contractor = dbContractor ?? seedContractors.find((c) => c.id === id);
 
   if (!contractor) {
+    // Use Next.js 404 page when id does not match any known contractor.
     notFound();
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Static page listing hiring intent and current open roles for the team.
 export default function CareersPage() {
   return (
     <div className="min-h-screen bg-green-50 py-16 px-4 sm:px-6 lg:px-8">

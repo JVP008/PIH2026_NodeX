@@ -1,5 +1,6 @@
 'use client';
 
+// Displays real-world style customer stories to build trust on the landing page.
 const testimonials = [
   {
     name: 'Priya Sharma',

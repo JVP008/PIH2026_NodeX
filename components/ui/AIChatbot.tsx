@@ -8,18 +8,22 @@ export default function AIChatbot() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Opens or closes the floating chat panel.
     const toggleChat = () => setIsOpen(!isOpen);
 
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
+        // Ignore empty messages and avoid duplicate sends while waiting.
         if (!input.trim() || isLoading) return;
 
         const userMsg = input.trim();
+        // Immediately show user message in chat history.
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setInput('');
         setIsLoading(true);
 
         try {
+            // Send user message to backend route powered by Gemini.
             const res = await fetch('/api/gemini/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -29,9 +33,10 @@ export default function AIChatbot() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to get response');
 
+            // Append AI response after successful request.
             setMessages(prev => [...prev, { role: 'ai', content: data.reply }]);
-        } catch (err) {
-            console.error(err);
+        } catch {
+            // Graceful fallback message when network/API call fails.
             setMessages(prev => [...prev, { role: 'ai', content: 'Sorry, I am having trouble connecting right now.' }]);
         } finally {
             setIsLoading(false);

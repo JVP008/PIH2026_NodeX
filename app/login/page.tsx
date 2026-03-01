@@ -13,6 +13,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { showToast } = useToast();
 
+  // Handles both sign-in and sign-up using the same form.
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -25,7 +26,7 @@ export default function LoginPage() {
         });
         if (error) throw error;
 
-        // Create profile in public.users
+        // Create an app-level profile row after account creation.
         if (data.user) {
           const { error: profileError } = await supabase
             .from('users')
@@ -38,6 +39,7 @@ export default function LoginPage() {
 
         showToast('Signup successful! Check your email.');
       } else {
+        // Existing users authenticate with email + password.
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
