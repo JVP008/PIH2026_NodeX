@@ -32,14 +32,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         />
       </head>
-      <body className={`${patrickHand.variable} font-sans antialiased bg-yellow-50 min-h-screen`}>
+      <body className={`${patrickHand.variable} font-sans antialiased bg-yellow-50 min-h-screen`} suppressHydrationWarning>
         <ToastProvider>
           <NavBar />
           <main className="min-h-screen">{children}</main>
