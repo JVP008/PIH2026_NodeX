@@ -95,7 +95,7 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
   const filtered = useMemo(
     () =>
       contractors
-        .filter((c) => activeFilter === 'All' || c.service === activeFilter)
+        .filter((c) => activeFilter === 'All' || c.service?.toLowerCase() === activeFilter.toLowerCase())
         .filter((c) => {
           if (!searchQuery) return true;
           const q = searchQuery.toLowerCase();
@@ -104,9 +104,9 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
           );
         })
         .sort((a, b) => {
-          if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-          if (sortBy === 'reviews') return (b.reviews || 0) - (a.reviews || 0);
-          if (sortBy === 'jobs') return (b.completed_jobs || 0) - (a.completed_jobs || 0);
+          if (sortBy === 'rating') return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+          if (sortBy === 'reviews') return (Number(b.reviews) || 0) - (Number(a.reviews) || 0);
+          if (sortBy === 'jobs') return (Number(b.completed_jobs) || 0) - (Number(a.completed_jobs) || 0);
           return 0;
         }),
     [contractors, activeFilter, searchQuery, sortBy]
