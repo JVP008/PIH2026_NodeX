@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 
 /**
  * Footer Component
@@ -7,6 +10,8 @@ import Link from 'next/link';
  * It contains helpful links to our social media, service categories, policies, and contact information.
  */
 export default function Footer() {
+  const [showAllServices, setShowAllServices] = useState(false);
+
   return (
     <footer className="bg-white text-black border-t-4 border-black pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4">
@@ -97,30 +102,52 @@ export default function Footer() {
                   HVAC
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/contractors?service=painting"
-                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
-                >
-                  Painting
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contractors?service=landscaping"
-                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
-                >
-                  Landscaping
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contractors?service=tailor"
-                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
-                >
-                  Tailor
-                </Link>
-              </li>
+              {!showAllServices ? (
+                <li>
+                  <button
+                    onClick={() => setShowAllServices(true)}
+                    className="hover:underline decoration-2 decoration-black underline-offset-2 transition font-black tracking-widest mt-1"
+                    aria-label="Show more services"
+                  >
+                    ...
+                  </button>
+                </li>
+              ) : (
+                <>
+                  <li className="animate-in fade-in slide-in-from-top-1 duration-300">
+                    <Link
+                      href="/contractors?service=painting"
+                      className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                    >
+                      Painting
+                    </Link>
+                  </li>
+                  <li className="animate-in fade-in slide-in-from-top-1 duration-300">
+                    <Link
+                      href="/contractors?service=landscaping"
+                      className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                    >
+                      Landscaping
+                    </Link>
+                  </li>
+                  <li className="animate-in fade-in slide-in-from-top-1 duration-300">
+                    <Link
+                      href="/contractors?service=tailor"
+                      className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                    >
+                      Tailor
+                    </Link>
+                  </li>
+                  <li className="animate-in fade-in duration-300 pt-1">
+                    <button
+                      onClick={() => setShowAllServices(false)}
+                      className="text-xs uppercase font-black text-gray-500 hover:text-black transition flex items-center gap-1"
+                    >
+                      Less <i className="fas fa-chevron-up text-xs"></i>
+                    </button>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
