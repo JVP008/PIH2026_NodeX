@@ -106,29 +106,42 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
             return;
         }
 
-        const user = (await supabase.auth.getUser()).data.user;
+        try {
+            const user = (await supabase.auth.getUser()).data.user;
 
-        const { error: bookingError } = await supabase
-            .from('bookings')
-            .insert([{
-                contractor_id: parseInt(selectedContractor.id) || null,
-                date: bookingDate,
-                time: bookingTime,
-                status: 'upcoming',
-                price: parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, '')) || 500,
-                user_id: user?.id || null
-            }]);
+            // Log for debugging
+            console.log('Booking attempt:', selectedContractor.id, user?.id);
 
-        if (bookingError) {
-            console.error('Booking insert issue:', bookingError.message);
+            const { error: bookingError } = await supabase
+                .from('bookings')
+                .insert([{
+                    contractor_id: parseInt(selectedContractor.id) || null,
+                    date: bookingDate,
+                    time: bookingTime,
+                    status: 'upcoming',
+                    price: parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, '')) || 500,
+                    user_id: user?.id || null
+                }]);
+
+            if (bookingError) {
+                console.error('Booking insert failed:', bookingError);
+                throw bookingError;
+            }
+
+            showToast(`Booking confirmed! Redirecting to your bookings...`);
+
+            // Clean up and redirect
+            setTimeout(() => {
+                setIsScheduleModalOpen(false);
+                setBookingDate('');
+                setBookingTime('');
+                window.location.href = '/bookings';
+            }, 1000);
+
+        } catch (err) {
+            console.error('Booking process error:', err);
             showToast('Failed to book pro. Please try again.', 'error');
-            return;
         }
-
-        setIsScheduleModalOpen(false);
-        setBookingDate('');
-        setBookingTime('');
-        showToast(`Booking confirmed! ${selectedContractor.name} will contact you shortly.`);
     };
 
     return (

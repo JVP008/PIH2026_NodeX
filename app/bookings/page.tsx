@@ -31,15 +31,31 @@ export default function BookingsPage() {
     const fetchBookings = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('bookings')
-                .select('*, contractor:contractors(name, image)')
-                .order('date', { ascending: false });
+            // Get current user to possibly filter, but for demo we show all or user's
+            const { data: { user } } = await supabase.auth.getUser();
 
-            if (error) throw error;
+            let query = supabase
+                .from('bookings')
+                .select('*, contractor:contractors(name, image, service)')
+                .order('created_at', { ascending: false });
+
+            // If we wanted to filter by user:
+            // if (user) {
+            //     query = query.eq('user_id', user.id);
+            // }
+
+            const { data, error } = await query;
+
+            if (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+
+            console.log('Fetched bookings:', data);
             setBookings(data || []);
-        } catch {
-            showToast('Failed to load bookings', 'error');
+        } catch (err) {
+            console.error('Bookings fetch failed:', err);
+            showToast('Failed to load bookings. Please check your connection.', 'error');
         } finally {
             setLoading(false);
         }
