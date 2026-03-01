@@ -97,6 +97,30 @@ export default function Footer() {
                   HVAC
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/contractors?service=painting"
+                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                >
+                  Painting
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contractors?service=landscaping"
+                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                >
+                  Landscaping
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contractors?service=tailor"
+                  className="hover:underline decoration-2 decoration-black underline-offset-2 transition"
+                >
+                  Tailor
+                </Link>
+              </li>
             </ul>
           </div>
 
