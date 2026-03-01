@@ -32,7 +32,7 @@ export default function Services() {
       <h2 className="text-4xl font-black text-center mb-12 uppercase tracking-wide">
         Our Services
       </h2>
-      <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 lg:gap-6">
         {services.map((s) => (
           <ServiceCard
             key={s.name}
