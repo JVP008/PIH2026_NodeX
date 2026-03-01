@@ -39,6 +39,7 @@ export interface Database {
           response_time: string | null;
           completed_jobs: number;
           description: string | null;
+          mobile: string | null;
           created_at: string;
         };
         Insert: {
@@ -55,6 +56,7 @@ export interface Database {
           response_time?: string | null;
           completed_jobs?: number;
           description?: string | null;
+          mobile?: string | null;
           created_at?: string;
         };
         Update: {
@@ -71,6 +73,7 @@ export interface Database {
           response_time?: string | null;
           completed_jobs?: number;
           description?: string | null;
+          mobile?: string | null;
           created_at?: string;
         };
       };

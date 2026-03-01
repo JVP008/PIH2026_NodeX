@@ -20,14 +20,15 @@ export default function PostJobPage() {
     location: '',
     price: '',
     description: '',
+    mobile: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Stop submission early if required fields are missing.
-    if (!formData.name || !formData.location || !formData.service) {
-      showToast('Please fill in all required fields (Name, Category, Location)', 'error');
+    if (!formData.name || !formData.location || !formData.service || !formData.mobile) {
+      showToast('Please fill in all required fields (Name, Mobile, Category, Location)', 'error');
       return;
     }
 
@@ -49,10 +50,17 @@ export default function PostJobPage() {
           verified: false,
           available: true,
           response_time: 'Usually within 1 hour',
+          mobile: formData.mobile,
         },
       ]);
 
-      if (error) throw error;
+      if (error) {
+        // Handle Postgres unique constraint violation for the mobile column
+        if (error.code === '23505' && error.message.includes('unique_mobile') || error.message.includes('contractors_mobile_key') || error.message.includes('mobile')) {
+          throw new Error('A professional with this mobile number is already registered!');
+        }
+        throw error;
+      }
 
       showToast('Your service profile has been posted successfully!');
       // Short delay lets users see success feedback before redirect.
@@ -132,6 +140,20 @@ export default function PostJobPage() {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full p-3 bg-white border-3 border-black rounded-lg focus:ring-0 focus:shadow-[4px_4px_0px_0px_#000] transition-all font-bold"
               placeholder="E.g., Ramesh Kumar or Star Plumbing Pvt Ltd"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-black font-black text-lg mb-2 uppercase">
+              Mobile Number (For Verification) *
+            </label>
+            <input
+              type="tel"
+              value={formData.mobile}
+              onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+              className="w-full p-3 bg-white border-3 border-black rounded-lg focus:ring-0 focus:shadow-[4px_4px_0px_0px_#000] transition-all font-bold tracking-widest"
+              placeholder="E.g., +91 9876543210"
               required
             />
           </div>
