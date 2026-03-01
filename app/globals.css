@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #fffdf5;
@@ -89,7 +89,6 @@ body {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -101,7 +100,6 @@ body {
 }
 
 @keyframes wiggle {
-
   0%,
   100% {
     transform: rotate(-1deg);
@@ -113,7 +111,6 @@ body {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0);

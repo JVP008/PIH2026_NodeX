@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Patrick_Hand } from "next/font/google";
-import "./globals.css";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import { ToastProvider } from "@/components/ui/Toast";
+import type { Metadata } from 'next';
+import { Patrick_Hand } from 'next/font/google';
+import './globals.css';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+import { ToastProvider } from '@/components/ui/Toast';
 // import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -15,9 +15,17 @@ const patrickHand = Patrick_Hand({
 
 export const metadata: Metadata = {
   title: "HouseConnect Pro — India's Trusted Local Contractor Marketplace",
-  description: "India's AI-powered contractor marketplace — connecting homeowners with verified plumbers, electricians, cleaners & more across 50+ cities.",
+  description:
+    "India's AI-powered contractor marketplace — connecting homeowners with verified plumbers, electricians, cleaners & more across 50+ cities.",
 };
 
+/**
+ * RootLayout
+ *
+ * This is the master layout that wraps all pages in the Next.js App Router.
+ * It loads the global styles, fonts (Patrick Hand), and sets the default metadata for SEO.
+ * It also wraps the whole app in a ToastProvider for notifications and displays the NavBar and Footer globally.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,16 +34,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        />
       </head>
-      <body
-        className={`${patrickHand.variable} font-sans antialiased bg-yellow-50 min-h-screen`}
-      >
+      <body className={`${patrickHand.variable} font-sans antialiased bg-yellow-50 min-h-screen`}>
         <ToastProvider>
           <NavBar />
-          <main className="min-h-screen">
-            {children}
-          </main>
+          <main className="min-h-screen">{children}</main>
           <Footer />
         </ToastProvider>
         {/* <Analytics /> */}
