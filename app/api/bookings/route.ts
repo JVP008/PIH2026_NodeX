@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import { isNonEmptyString, normalizeText } from '@/lib/utils';
+import {normalizeText } from '@/lib/utils';
 import { BookingPayload } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
