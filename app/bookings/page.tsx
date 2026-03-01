@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
@@ -25,6 +26,7 @@ interface BookingRow {
  * directly from here using the pop-up payment modal.
  */
 export default function BookingsPage() {
+  const router = useRouter();
   const { showToast } = useToast();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);

@@ -39,6 +39,7 @@ export default function NavBar() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMobileOpen(false);
   }, [pathname]);
 

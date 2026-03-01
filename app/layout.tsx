@@ -4,6 +4,7 @@ import './globals.css';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { ToastProvider } from '@/components/ui/Toast';
+import AIChatbot from '@/components/ui/AIChatbot';
 // import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
         <ToastProvider>
           <NavBar />
           <main className="min-h-screen">{children}</main>
+          <AIChatbot />
           <Footer />
         </ToastProvider>
         {/* <Analytics /> */}

@@ -1,0 +1,51 @@
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\bookings\route.ts
+   6:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+  16:12  warning  '_error' is defined but never used   @typescript-eslint/no-unused-vars
+  29:12  warning  '_error' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\contractors\route.ts
+  22:12  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\disputes\route.ts
+   6:27  warning  '_request' is defined but never used  @typescript-eslint/no-unused-vars
+  15:12  warning  '_error' is defined but never used    @typescript-eslint/no-unused-vars
+  28:12  warning  '_error' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\api\jobs\route.ts
+  14:12  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\bookings\page.tsx
+  37:6   warning  React Hook useEffect has a missing dependency: 'fetchBookings'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  46:17  warning  'user' is assigned a value but never used                                                                         @typescript-eslint/no-unused-vars
+  66:14  warning  'err' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\app\disputes\page.tsx
+  41:6  warning  React Hook useEffect has a missing dependency: 'fetchDisputes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\NavBar.tsx
+  42:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\NavBar.tsx:42:5
+  40 |
+  41 |   useEffect(() => {
+> 42 |     setMobileOpen(false);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  43 |   }, [pathname]);
+  44 |
+  45 |   useEffect(() => {  react-hooks/set-state-in-effect
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\contractors\ContractorList.tsx
+  4:10  warning  'useRouter' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jayes\Documents\PROJECTS\APPS\PIH2026_NodeX\components\home\Stats.tsx
+  66:18  warning  'setLoaded' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 15 problems (1 error, 14 warnings)
+
