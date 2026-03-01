@@ -7,34 +7,39 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
+// True when real Supabase credentials are configured.
+const isSupabaseConfigured =
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+
 export default async function ContractorsPage() {
   // Try to fetch from Supabase; fall back to seed data if it fails or returns nothing
   let contractors = seedContractors;
-  try {
-    const { data, error } = await supabase.from('contractors').select('*');
 
-    if (error) {
-      const errMsg = typeof error === 'object' ? (error as any).message : String(error);
-      const errCode = typeof error === 'object' ? (error as any).code : 'N/A';
-      console.error(`Supabase SSR Error on ContractorsPage: ${errMsg} (code: ${errCode})`);
-    }
+  if (isSupabaseConfigured) {
+    try {
+      const { data, error } = await supabase.from('contractors').select('*');
 
-    if (data && data.length > 0) {
-      // Deduplicate by name (case-insensitive and trimmed)
-      const uniqueNames = new Set();
-      const deduplicated = [];
-      for (const req of data) {
-        const nameKey = (req.name || '').toLowerCase().trim();
-        if (!uniqueNames.has(nameKey)) {
-          uniqueNames.add(nameKey);
-          deduplicated.push(req);
-        }
+      if (error) {
+        console.warn(`[ContractorsPage] Supabase query error: ${error.message ?? 'unknown'}`);
       }
-      contractors = deduplicated;
+
+      if (data && data.length > 0) {
+        // Deduplicate by name (case-insensitive and trimmed)
+        const uniqueNames = new Set();
+        const deduplicated = [];
+        for (const req of data) {
+          const nameKey = (req.name || '').toLowerCase().trim();
+          if (!uniqueNames.has(nameKey)) {
+            uniqueNames.add(nameKey);
+            deduplicated.push(req);
+          }
+        }
+        contractors = deduplicated;
+      }
+    } catch {
+      // Supabase unreachable — silently fall back to seed data
     }
-  } catch (err) {
-    const errMsg = err instanceof Error ? err.message : String(err);
-    console.error(`Unexpected SSR Error on ContractorsPage: ${errMsg}`);
   }
 
   return (
