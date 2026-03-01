@@ -8,55 +8,96 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 const MAX_MESSAGE_LENGTH = 1000;
 
 const isNonEmptyString = (value: unknown): value is string =>
-    typeof value === 'string' && value.trim().length > 0;
+  typeof value === 'string' && value.trim().length > 0;
+
+const serviceHints = ['plumbing', 'electrical', 'cleaning', 'hvac', 'painting', 'landscaping'] as const;
+
+const buildFallbackReply = ({
+  message,
+  contractors,
+}: {
+  message: string;
+  contractors: Array<{ name: string | null; service: string | null; rating: number | null; location: string | null }>;
+}) => {
+  const lowerMessage = message.toLowerCase();
+  const requestedService = serviceHints.find((service) => lowerMessage.includes(service));
+
+  const candidates = requestedService
+    ? contractors.filter((contractor) =>
+      contractor.service?.toLowerCase().includes(requestedService)
+    )
+    : contractors;
+
+  const sorted = [...candidates].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
+  const best = sorted[0] ?? contractors[0];
+
+  if (!best) {
+    return 'I can help you find a professional. Please share your city and required service so I can suggest the best match.';
+  }
+
+  return `A good match is ${best.name ?? 'a top-rated professional'} for ${best.service ?? 'your request'}${best.location ? ` in ${best.location}` : ''}. They are rated ${best.rating ?? 'highly'} and should be a reliable option.`;
+};
 
 export async function POST(req: Request) {
-    if (!genAI) {
-        return NextResponse.json(
-            { error: 'Gemini API is not configured on the server.' },
-            { status: 500 }
-        );
+  try {
+    // Read user question from chat request payload.
+    const { message } = await req.json();
+
+    if (!isNonEmptyString(message)) {
+      return NextResponse.json({ error: 'Message is required.' }, { status: 400 });
     }
 
-    try {
-        // Read user question from chat request payload.
-        const { message } = await req.json();
+    const trimmedMessage = message.trim();
 
-        if (!isNonEmptyString(message)) {
-            return NextResponse.json({ error: 'Message is required.' }, { status: 400 });
-        }
+    if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        { error: `Message is too long. Maximum ${MAX_MESSAGE_LENGTH} characters allowed.` },
+        { status: 400 }
+      );
+    }
 
-        const trimmedMessage = message.trim();
+    // Fetch current contractor data so AI recommendations stay grounded.
+    const { data: contractors, error: contractorsError } = await supabase
+      .from('contractors')
+      .select('*')
+      .limit(20);
 
-        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
-            return NextResponse.json(
-                { error: `Message is too long. Maximum ${MAX_MESSAGE_LENGTH} characters allowed.` },
-                { status: 400 }
-            );
-        }
+    if (contractorsError) {
+      return NextResponse.json(
+        { error: 'Unable to fetch contractor data for recommendations right now.' },
+        { status: 503 }
+      );
+    }
 
-        // Fetch current contractor data so AI recommendations stay grounded.
-        const { data: contractors, error: contractorsError } = await supabase
-            .from('contractors')
-            .select('*')
-            .limit(20);
+    if (!genAI) {
+      const fallbackReply = buildFallbackReply({
+        message: trimmedMessage,
+        contractors:
+          contractors?.map((contractor) => ({
+            name: contractor.name,
+            service: contractor.service,
+            rating: contractor.rating,
+            location: contractor.location,
+          })) ?? [],
+      });
 
-        if (contractorsError) {
-            return NextResponse.json(
-                { error: 'Unable to fetch contractor data for recommendations right now.' },
-                { status: 503 }
-            );
-        }
+      return NextResponse.json({ reply: fallbackReply });
+    }
 
-        // Turn contractor records into plain text context for the AI prompt.
-        const contextData = contractors
-            ? contractors.map(c => `- ${c.name} (${c.service}): Rating ${c.rating}, ${c.completed_jobs} jobs done. Location: ${c.location}. Price: ${c.price}`).join('\n')
-            : 'No contractors available.';
+    // Turn contractor records into plain text context for the AI prompt.
+    const contextData = contractors
+      ? contractors
+          .map(
+            (c) =>
+              `- ${c.name} (${c.service}): Rating ${c.rating}, ${c.completed_jobs} jobs done. Location: ${c.location}. Price: ${c.price}`
+          )
+          .join('\n')
+      : 'No contractors available.';
 
-        // Use lightweight Gemini model for fast conversational responses.
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Use lightweight Gemini model for fast conversational responses.
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-        const prompt = `You are a helpful assistant for "HouseConnect Pro", an Indian app that connects homeowners with local professionals.
+    const prompt = `You are a helpful assistant for "HouseConnect Pro", an Indian app that connects homeowners with local professionals.
     The user is asking: "${trimmedMessage}"
 
 Here is a list of our currently available professionals:
@@ -64,15 +105,15 @@ ${contextData}
 
 Reply to the user in a friendly, helpful tone. Be concise (max 3 sentences). Recommend the best professional from the list above based on their query (match service, location, or rating if applicable). Do not make up professionals that are not on the list.`;
 
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-        return NextResponse.json({ reply: text.trim() });
-    } catch {
-        // Avoid leaking internal details while returning a user-friendly error.
-        return NextResponse.json(
-            { error: 'Failed to process request. Please try again later.' },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json({ reply: text.trim() });
+  } catch {
+    // Avoid leaking internal details while returning a user-friendly error.
+    return NextResponse.json(
+      { error: 'Failed to process request. Please try again later.' },
+      { status: 500 }
+    );
+  }
 }

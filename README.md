@@ -18,13 +18,13 @@ HouseConnect Pro brings transparency, speed, and trust to home services by offer
 
 ## Tech Stack
 
-| Layer | Tech |
-|-------|------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS (Neo-Brutalist theme) |
-| Database & Auth | Supabase |
-| Deployment | Vercel |
+| Layer           | Tech                               |
+| --------------- | ---------------------------------- |
+| Framework       | Next.js 15 (App Router)            |
+| Language        | TypeScript                         |
+| Styling         | Tailwind CSS (Neo-Brutalist theme) |
+| Database & Auth | Supabase                           |
+| Deployment      | Vercel                             |
 
 ## Getting Started
 
@@ -49,4 +49,4 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-*Built with ☕ and deadlines for PIH 2026*
+_Built with ☕ and deadlines for PIH 2026_

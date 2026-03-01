@@ -44,7 +44,11 @@ export async function POST(request: Request) {
     const normalizedService = normalizeText(service);
     const normalizedCategory = normalizeText(category);
 
-    if (!normalizedDescription || !normalizedLocation || (!normalizedService && !normalizedCategory)) {
+    if (
+      !normalizedDescription ||
+      !normalizedLocation ||
+      (!normalizedService && !normalizedCategory)
+    ) {
       return NextResponse.json(
         { error: 'service/category, description, and location are required' },
         { status: 400 }
@@ -94,7 +98,8 @@ export async function POST(request: Request) {
     let { data, error } = await supabase.from('jobs').insert([modernPayload]).select();
 
     if (error && isSchemaColumnError(error)) {
-      const hasLegacyBudget = legacyPayload.budget_min !== null || legacyPayload.budget_max !== null;
+      const hasLegacyBudget =
+        legacyPayload.budget_min !== null || legacyPayload.budget_max !== null;
 
       if (!hasLegacyBudget && normalizedBudget) {
         const numericBudget = Number.parseInt(normalizedBudget.replace(/[^0-9]/g, ''), 10);

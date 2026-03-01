@@ -2,20 +2,29 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const apiKey = process.env.GEMINI_API_KEY;
-// Create AI client once; if key is missing, requests are rejected gracefully.
+// Create AI client once; if key is missing, we use a local fallback generator.
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 const MAX_FIELD_LENGTH = 200;
 
 const normalizeText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
-export async function POST(req: Request) {
-  if (!genAI) {
-    return NextResponse.json(
-      { error: 'Gemini API is not configured on the server.' },
-      { status: 500 }
-    );
-  }
+const buildFallbackDescription = ({
+  title,
+  service,
+  location,
+}: {
+  title: string;
+  service: string;
+  location: string;
+}) => {
+  const intro = title
+    ? `${title} — experienced ${service} services available in ${location}.`
+    : `Experienced ${service} services available in ${location}.`;
 
+  return `${intro} Professional, on-time work with clear pricing and quality-focused execution for homes and small businesses.`;
+};
+
+export async function POST(req: Request) {
   try {
     // Read job details from frontend request.
     const { title, service, location } = await req.json();
@@ -40,6 +49,16 @@ export async function POST(req: Request) {
         { error: `Each input must be at most ${MAX_FIELD_LENGTH} characters.` },
         { status: 400 }
       );
+    }
+
+    if (!genAI) {
+      return NextResponse.json({
+        description: buildFallbackDescription({
+          title: normalizedTitle,
+          service: normalizedService,
+          location: normalizedLocation,
+        }),
+      });
     }
 
     // Select the Gemini model used for short content generation.

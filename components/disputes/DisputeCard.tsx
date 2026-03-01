@@ -27,7 +27,8 @@ export default function DisputeCard({
         <div className="flex items-center gap-2">
           <span className="text-lg">🔍</span>
           <h4 className="font-black text-lg">
-            {dispute.booking?.service || 'Service'} - {dispute.booking?.contractor?.name || 'Contractor'}
+            {dispute.booking?.service || 'Service'} -{' '}
+            {dispute.booking?.contractor?.name || 'Contractor'}
           </h4>
           {dispute.name && <span className="text-gray-500 font-medium">by {dispute.name}</span>}
         </div>
@@ -37,7 +38,9 @@ export default function DisputeCard({
       </div>
       <p className="text-black font-medium text-sm">{dispute.description}</p>
       <p className="text-gray-400 text-xs font-bold mt-2">
-        {dispute.created_at ? new Date(dispute.created_at).toLocaleDateString('en-IN') : 'Unknown Date'}
+        {dispute.created_at
+          ? new Date(dispute.created_at).toLocaleDateString('en-IN')
+          : 'Unknown Date'}
       </p>
     </div>
   );

@@ -34,15 +34,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid booking payload' }, { status: 400 });
     }
 
-    const {
-      contractor_id,
-      date,
-      time,
-      notes,
-      status,
-      price,
-      user_id,
-    } = body as Record<string, unknown>;
+    const { contractor_id, date, time, notes, status, price, user_id } = body as Record<
+      string,
+      unknown
+    >;
 
     if (!isNonEmptyString(date) || !isNonEmptyString(time)) {
       return NextResponse.json({ error: 'Date and time are required' }, { status: 400 });

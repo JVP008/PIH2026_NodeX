@@ -69,7 +69,10 @@ export default function PostJobPage() {
 
       showToast('Your service profile has been posted successfully!');
       // Short delay lets users see success feedback before redirect.
-      setTimeout(() => router.push('/contractors'), 1500);
+      setTimeout(() => {
+        router.refresh();
+        router.push('/contractors');
+      }, 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Error: ${msg}`, 'error');
@@ -81,7 +84,10 @@ export default function PostJobPage() {
   const handleGenerateDescription = async () => {
     // AI needs at least service + location to write a useful description.
     if (!formData.service || !formData.location) {
-      showToast('Please enter both Service Category and Location first to generate a description.', 'error');
+      showToast(
+        'Please enter both Service Category and Location first to generate a description.',
+        'error'
+      );
       return;
     }
 

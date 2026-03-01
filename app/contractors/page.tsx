@@ -13,7 +13,7 @@ export default async function ContractorsPage() {
   try {
     const { data, error } = await supabase.from('contractors').select('*');
     if (error) {
-      console.error("Supabase SSR Error on ContractorsPage:", error);
+      console.error('Supabase SSR Error on ContractorsPage:', error);
     }
     if (data && data.length > 0) {
       // Deduplicate by name (case-insensitive and trimmed)
