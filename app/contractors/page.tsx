@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import ContractorList from '@/components/contractors/ContractorList';
 import { seedContractors } from '@/lib/seedContractors';
+import { Contractor } from '@/types';
 
 // Caching disabled to ensure real-time contractor updates
 export const dynamic = 'force-dynamic';
@@ -14,25 +15,25 @@ const isSupabaseConfigured =
 
 export default async function ContractorsPage() {
   // Try to fetch from Supabase; fall back to seed data if it fails or returns nothing
-  let contractors = seedContractors;
+  let contractors: Contractor[] = seedContractors;
 
   if (isSupabaseConfigured) {
     try {
       const { data, error } = await supabase.from('contractors').select('*');
 
       if (error) {
-        console.warn(`[ContractorsPage] Supabase query error: ${error.message ?? 'unknown'}`);
+        throw error;
       }
 
       if (data && data.length > 0) {
         // Deduplicate by name (case-insensitive and trimmed)
-        const uniqueNames = new Set();
-        const deduplicated = [];
-        for (const req of data) {
-          const nameKey = (req.name || '').toLowerCase().trim();
+        const uniqueNames = new Set<string>();
+        const deduplicated: Contractor[] = [];
+        for (const contractorRecord of data) {
+          const nameKey = (contractorRecord.name || '').toLowerCase().trim();
           if (!uniqueNames.has(nameKey)) {
             uniqueNames.add(nameKey);
-            deduplicated.push(req);
+            deduplicated.push(contractorRecord);
           }
         }
         contractors = deduplicated;

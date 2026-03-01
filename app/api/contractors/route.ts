@@ -25,8 +25,7 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error fetching contractors:', error);
+  } catch {
     return NextResponse.json({ error: 'Error fetching contractors' }, { status: 500 });
   }
 }

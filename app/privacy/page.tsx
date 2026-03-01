@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Static page that explains what user data is collected and how it is used.
 export default function PrivacyPage() {
   return (

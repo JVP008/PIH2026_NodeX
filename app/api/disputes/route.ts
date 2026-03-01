@@ -21,8 +21,7 @@ export async function GET() {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error fetching disputes:', error);
+  } catch {
     return NextResponse.json({ error: 'Error fetching disputes' }, { status: 500 });
   }
 }
@@ -71,8 +70,7 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error creating dispute:', error);
+  } catch {
     return NextResponse.json({ error: 'Error creating dispute' }, { status: 500 });
   }
 }

@@ -29,8 +29,6 @@ export default function ReviewModal({
       setComment('');
       setRating(5);
       onClose();
-    } catch (error) {
-      console.error('Review submission failed:', error);
     } finally {
       setIsSubmitting(false);
     }

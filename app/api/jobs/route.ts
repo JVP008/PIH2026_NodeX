@@ -53,8 +53,7 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error creating job:', error);
+  } catch {
     return NextResponse.json({ error: 'Error creating job' }, { status: 500 });
   }
 }

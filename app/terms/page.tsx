@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Static page describing expected behavior and platform responsibilities.
 export default function TermsPage() {
   return (

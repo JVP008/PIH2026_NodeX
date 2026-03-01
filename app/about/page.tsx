@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Static page explaining why HouseConnect exists and what trust promises we make.
 export default function AboutPage() {
   return (

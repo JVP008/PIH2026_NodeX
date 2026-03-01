@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import Link from 'next/link';
 
 /**
@@ -10,16 +9,13 @@ import Link from 'next/link';
  * It displays a friendly error message to the user and provides a button to try loading the page again.
  */
 export default function Error({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-  }, [error]);
+  void _error;
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center p-4">

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import {normalizeText } from '@/lib/utils';
+import { normalizeText } from '@/lib/utils';
 import { BookingPayload } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
@@ -21,8 +21,7 @@ export async function GET() {
     if (fetchError) throw fetchError;
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error fetching bookings:', error);
+  } catch {
     return NextResponse.json({ error: 'Error fetching bookings' }, { status: 500 });
   }
 }
@@ -130,8 +129,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error creating booking:', error);
+  } catch {
     return NextResponse.json({ error: 'Error creating booking' }, { status: 500 });
   }
 }

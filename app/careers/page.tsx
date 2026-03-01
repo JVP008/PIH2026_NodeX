@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Static page listing hiring intent and current open roles for the team.
 export default function CareersPage() {
   return (

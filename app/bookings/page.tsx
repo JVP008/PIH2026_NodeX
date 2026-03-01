@@ -10,6 +10,39 @@ import BookingCard from '@/components/bookings/BookingCard';
 import ReviewModal from '@/components/bookings/ReviewModal';
 
 import { Booking } from '@/types';
+import { Database } from '@/types/db';
+
+type BookingStatus = Booking['status'];
+
+type BookingRecord = Database['public']['Tables']['bookings']['Row'] & {
+  contractor?: {
+    name: string | null;
+    image: string | null;
+    service: string | null;
+  } | null;
+};
+
+const ALLOWED_BOOKING_STATUSES: BookingStatus[] = ['upcoming', 'completed', 'cancelled', 'pending'];
+
+const toBookingStatus = (status: string | null): BookingStatus => {
+  if (status && ALLOWED_BOOKING_STATUSES.includes(status as BookingStatus)) {
+    return status as BookingStatus;
+  }
+  return 'pending';
+};
+
+const normalizeBooking = (record: BookingRecord): Booking => ({
+  ...record,
+  status: toBookingStatus(record.status),
+  contractor: record.contractor
+    ? {
+        name: record.contractor.name ?? 'Contractor',
+        image: record.contractor.image,
+        service: record.contractor.service,
+      }
+    : undefined,
+  service: record.contractor?.service ?? undefined,
+});
 
 export default function BookingsPage() {
   const router = useRouter();
@@ -63,8 +96,8 @@ export default function BookingsPage() {
         throw error;
       }
 
-      // Assume the database response shape conforms to strict Booking array structure
-      setBookings((data as unknown as Booking[]) || []);
+      const normalizedBookings = (data ?? []).map((record) => normalizeBooking(record));
+      setBookings(normalizedBookings);
     } catch {
       // If anything fails, tell the user in plain language.
       showToast('Failed to load bookings. Please check your connection.', 'error');
@@ -177,8 +210,7 @@ export default function BookingsPage() {
           throw contractorUpdateError;
         }
       }
-    } catch (err) {
-      console.error('Post-payment update error:', err);
+    } catch {
       // Keep payment success flow uninterrupted even if secondary updates fail.
     }
 
