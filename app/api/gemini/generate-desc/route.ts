@@ -35,7 +35,6 @@ Make it sound polite, direct, and clear. Do not include placeholders or generic 
 
     return NextResponse.json({ description: text.trim() });
   } catch (error) {
-    console.error('Error generating description with Gemini:', error);
     return NextResponse.json(
       { error: 'Failed to generate description. Please try again.' },
       { status: 500 }

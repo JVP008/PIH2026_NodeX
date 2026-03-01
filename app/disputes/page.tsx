@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
+import DisputeCard from '@/components/disputes/DisputeCard';
 
 interface Dispute {
   id: string;
@@ -87,18 +88,6 @@ export default function DisputesPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const statusIcon: Record<string, string> = {
-    'In Review': '🔍',
-    Resolved: '✅',
-    Rejected: '❌',
-  };
-
-  const statusColor: Record<string, string> = {
-    'In Review': 'bg-yellow-200',
-    Resolved: 'bg-green-200',
-    Rejected: 'bg-red-200',
   };
 
   return (
@@ -220,33 +209,7 @@ export default function DisputesPage() {
       ) : disputes.length > 0 ? (
         <div className="space-y-3">
           {disputes.map((dispute) => (
-            <div
-              key={dispute.id}
-              className="bg-white border-3 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_#000]"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">
-                    {statusIcon[dispute.status || 'In Review'] || '🔍'}
-                  </span>
-                  <span className="font-black capitalize">
-                    {dispute.type.replace(/([A-Z])/g, ' $1')}
-                  </span>
-                  {dispute.name && (
-                    <span className="text-gray-500 font-medium">by {dispute.name}</span>
-                  )}
-                </div>
-                <span
-                  className={`px-3 py-1 border-2 border-black rounded-lg font-bold text-xs ${statusColor[dispute.status || 'In Review'] || 'bg-gray-200'} shadow-[2px_2px_0px_0px_#000]`}
-                >
-                  {dispute.status || 'In Review'}
-                </span>
-              </div>
-              <p className="text-black font-medium text-sm">{dispute.description}</p>
-              <p className="text-gray-400 text-xs font-bold mt-2">
-                {new Date(dispute.created_at).toLocaleDateString('en-IN')}
-              </p>
-            </div>
+            <DisputeCard key={dispute.id} dispute={dispute} />
           ))}
         </div>
       ) : (

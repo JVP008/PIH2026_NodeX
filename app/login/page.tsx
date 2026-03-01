@@ -31,7 +31,9 @@ export default function LoginPage() {
             .from('users')
             .insert([{ id: data.user.id, name: email.split('@')[0], email }]);
 
-          if (profileError) console.warn('Profile creation failed', profileError);
+          if (profileError) {
+            showToast('Profile saved but user record creation failed', 'error');
+          }
         }
 
         showToast('Signup successful! Check your email.');

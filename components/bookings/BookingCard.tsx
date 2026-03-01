@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Contractor } from '@/types';
 
 /**
  * BookingCard Component
@@ -10,6 +9,9 @@ import { Contractor } from '@/types';
  */
 export default function BookingCard({
   booking,
+  onPay,
+  onCancel,
+  onReport,
 }: {
   booking: {
     id: string;
@@ -17,8 +19,15 @@ export default function BookingCard({
     time: string;
     status: string | null;
     price: number | null;
-    contractor: Contractor | null;
+    contractor: {
+      name?: string | null;
+      image?: string | null;
+      service?: string | null;
+    } | null;
   };
+  onPay?: (booking: { id: string; price: number | null }) => void;
+  onCancel?: (id: string) => void;
+  onReport?: (booking: { id: string }) => void;
 }) {
   const statusColors: Record<string, string> = {
     upcoming: 'bg-blue-200',
@@ -49,17 +58,31 @@ export default function BookingCard({
         <span className="font-black text-lg">₹{booking.price || 0}</span>
         <div className="flex gap-2">
           {booking.status === 'upcoming' && (
-            <button className="px-3 py-1 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]">
-              Pay ₹{booking.price}
-            </button>
+            <>
+              <button
+                onClick={() => onPay?.({ id: booking.id, price: booking.price })}
+                className="px-3 py-1 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
+              >
+                Pay ₹{booking.price}
+              </button>
+              <button
+                onClick={() => onCancel?.(booking.id)}
+                className="px-3 py-1 bg-red-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
+              >
+                Cancel
+              </button>
+            </>
           )}
           {booking.status === 'completed' && (
-            <Link
-              href="/disputes"
-              className="px-3 py-1 bg-orange-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
-            >
-              Report
-            </Link>
+            <>
+              <Link
+                href="/disputes"
+                className="px-3 py-1 bg-orange-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
+                onClick={() => onReport?.({ id: booking.id })}
+              >
+                Report
+              </Link>
+            </>
           )}
         </div>
       </div>

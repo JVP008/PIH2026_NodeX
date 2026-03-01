@@ -33,7 +33,7 @@ export default function Footer() {
                 <i className="fa-brands fa-x-twitter text-black"></i>
               </a>
               <a
-                href="https://www.instagram.com/jayesh_patil_008?igsh=ZWY0bXpnM29lcDZt"
+                href="https://www.facebook.com/houseconnectpro"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-white border-3 border-black rounded-full flex items-center justify-center hover:bg-blue-600 hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_#000] shadow-[2px_2px_0px_0px_#000] transition-all"

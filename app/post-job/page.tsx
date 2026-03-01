@@ -19,6 +19,7 @@ export default function PostJobPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -63,10 +64,41 @@ export default function PostJobPage() {
       setTimeout(() => router.push('/contractors'), 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error('Form submit error:', msg);
       showToast(`Error: ${msg}`, 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!formData.service || !formData.location) {
+      showToast('Please enter both Service Category and Location first to generate a description.', 'error');
+      return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+      const res = await fetch('/api/gemini/generate-desc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.name,
+          service: formData.service,
+          location: formData.location
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to generate description');
+
+      setFormData(prev => ({ ...prev, description: data.description }));
+      showToast('✨ Magic description generated successfully!');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('AI generation error:', msg);
+      showToast(`AI Error: ${msg}`, 'error');
+    } finally {
+      setIsGeneratingDesc(false);
     }
   };
 
@@ -163,10 +195,21 @@ export default function PostJobPage() {
           </div>
 
           <div className="mb-8">
-            <label className="block text-black font-black text-lg mb-2 uppercase">
-              Describe Your Speciality{' '}
-              <span className="text-gray-400 font-medium text-base normal-case">(optional)</span>
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-black font-black text-lg uppercase">
+                Describe Your Speciality{' '}
+                <span className="text-gray-400 font-medium text-base normal-case">(optional)</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleGenerateDescription}
+                disabled={isGeneratingDesc}
+                className="text-sm px-3 py-1 bg-purple-200 text-purple-900 border-2 border-black rounded-lg font-bold shadow-[2px_2px_0px_0px_#000] hover:-translate-y-[1px] hover:shadow-[3px_3px_0px_0px_#000] active:translate-y-[1px] active:shadow-none transition-all flex items-center gap-1 disabled:opacity-50"
+              >
+                <i className={`fas fa-magic ${isGeneratingDesc ? 'animate-pulse' : ''}`}></i>
+                {isGeneratingDesc ? 'Writing...' : 'Auto-write'}
+              </button>
+            </div>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}

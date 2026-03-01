@@ -140,7 +140,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
       ]);
 
       if (bookingError) {
-        console.error('Booking insert failed:', bookingError);
         throw bookingError;
       }
 
@@ -154,7 +153,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         window.location.href = '/bookings';
       }, 1000);
     } catch (err) {
-      console.error('Booking process error:', err);
       showToast('Failed to book pro. Please try again.', 'error');
     }
   };
