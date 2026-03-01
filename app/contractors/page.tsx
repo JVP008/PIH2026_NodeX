@@ -12,12 +12,13 @@ export default async function ContractorsPage() {
   let contractors = seedContractors;
   try {
     const { data, error } = await supabase.from('contractors').select('*');
+
     if (error) {
-      // Log only the useful parts — the raw error object serialises as {} in Next.js SSR
-      console.error(
-        `Supabase SSR Error on ContractorsPage: ${error.message ?? 'Unknown error'} (code: ${error.code ?? '-'})`
-      );
+      const errMsg = typeof error === 'object' ? (error as any).message : String(error);
+      const errCode = typeof error === 'object' ? (error as any).code : 'N/A';
+      console.error(`Supabase SSR Error on ContractorsPage: ${errMsg} (code: ${errCode})`);
     }
+
     if (data && data.length > 0) {
       // Deduplicate by name (case-insensitive and trimmed)
       const uniqueNames = new Set();
@@ -31,8 +32,9 @@ export default async function ContractorsPage() {
       }
       contractors = deduplicated;
     }
-  } catch {
-    // Supabase unavailable — fallback to seed data
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error(`Unexpected SSR Error on ContractorsPage: ${errMsg}`);
   }
 
   return (
