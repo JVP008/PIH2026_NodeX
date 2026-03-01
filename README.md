@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏠 HouseConnect Pro
+
+India's home services marketplace — connecting homeowners with verified local professionals across 50+ cities.
+
+**Built by Team NodeX (JVP008) for PIH 2026 Hackathon**
+
+## The Problem
+
+India's ₹1.2 Lakh Crore home services market is fragmented, unorganized, and riddled with trust issues. Homeowners struggle to find reliable professionals, and skilled workers lack a platform to grow.
+
+## The Solution
+
+HouseConnect Pro brings transparency, speed, and trust to home services by offering:
+
+- **Smart Discovery** — Browse verified pros by category, rating, location, and availability
+- **Instant Booking** — Post a job, get matched, book and pay — all in one flow
+- **Trust Layer** — Verified profiles, ratings, reviews, and dispute resolution
+- **Pan-India Coverage** — 50+ cities from metros to tier-2 towns
+
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS (Neo-Brutalist theme) |
+| Database & Auth | Supabase |
+| Deployment | Vercel |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# install dependencies
+npm install
+
+# set up environment variables
+cp .env.example .env.local
+# add your NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Team NodeX
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Hackathon ID:** JVP008
+**Location:** Sakoli, Bhandara, Maharashtra
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Built with ☕ and deadlines for PIH 2026*
