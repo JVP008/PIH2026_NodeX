@@ -35,10 +35,19 @@ export default function DisputesPage() {
     // Show skeleton cards while loading data.
     setLoading(true);
     try {
+      // Read signed-in user
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        setDisputes([]);
+        setLoading(false);
+        return;
+      }
+
       // Fetch newest disputes first and keep the list short for readability.
       const { data, error } = await supabase
         .from('disputes')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10);
       if (error) throw error;
@@ -67,9 +76,13 @@ export default function DisputesPage() {
     // Disable submit button to prevent duplicate clicks.
     setSubmitting(true);
     try {
+      // Get current user
+      const user = (await supabase.auth.getUser()).data.user;
+
       // Save the dispute details into Supabase.
       const { error } = await supabase.from('disputes').insert([
         {
+          user_id: user?.id || null,
           name: form.name,
           email: form.email || null,
           booking_id: form.bookingId || null,

@@ -12,6 +12,7 @@ export default function BookingCard({
   onPay,
   onCancel,
   onReport,
+  onReview,
 }: {
   booking: {
     id: string;
@@ -28,6 +29,7 @@ export default function BookingCard({
   onPay?: (booking: { id: string; price: number | null }) => void;
   onCancel?: (id: string) => void;
   onReport?: (booking: { id: string }) => void;
+  onReview?: (booking: { id: string; contractor: { name: string } | null }) => void;
 }) {
   const statusColors: Record<string, string> = {
     upcoming: 'bg-blue-200',
@@ -75,10 +77,15 @@ export default function BookingCard({
           )}
           {booking.status === 'completed' && (
             <>
+              <button
+                onClick={() => onReview?.({ id: booking.id, contractor: { name: booking.contractor?.name || 'Contractor' } })}
+                className="px-3 py-1 bg-yellow-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
+              >
+                Rate & Review
+              </button>
               <Link
                 href="/disputes"
                 className="px-3 py-1 bg-orange-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
-                onClick={() => onReport?.({ id: booking.id })}
               >
                 Report
               </Link>

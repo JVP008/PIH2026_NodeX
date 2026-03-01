@@ -7,9 +7,12 @@ import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
 import Modal from '@/components/ui/Modal';
 import BookingCard from '@/components/bookings/BookingCard';
+import ReviewModal from '@/components/bookings/ReviewModal';
 
 interface BookingRow {
   id: string;
+  user_id: string | null;
+  contractor_id: number | null;
   date: string;
   time: string;
   status: string | null;
@@ -25,6 +28,7 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [payModalOpen, setPayModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
 
   // Get the latest booking list from the database so the page stays up to date.
@@ -32,13 +36,20 @@ export default function BookingsPage() {
     // Show loading placeholders while data is being requested.
     setLoading(true);
     try {
+      // Read signed-in user so bookings can be filtered by that account.
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        setBookings([]);
+        setLoading(false);
+        return;
+      }
+
       // Ask Supabase for bookings and include contractor details in the same request.
-      const query = supabase
+      const { data, error } = await supabase
         .from('bookings')
         .select('*, contractor:contractors(name, image, service)')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
 
       if (error) {
         throw error;
@@ -75,6 +86,35 @@ export default function BookingsPage() {
     // Save the booking user picked, then open the payment confirmation dialog.
     setSelectedBooking(booking);
     setPayModalOpen(true);
+  };
+
+  const handleReview = (booking: BookingRow) => {
+    setSelectedBooking(booking);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSubmit = async (rating: number, comment: string) => {
+    if (!selectedBooking) return;
+
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      const { error } = await supabase.from('reviews').insert([
+        {
+          user_id: user?.id,
+          contractor_id: selectedBooking.contractor_id,
+          booking_id: selectedBooking.id,
+          rating,
+          comment,
+        },
+      ]);
+
+      if (error) throw error;
+      showToast('Thank you for your review!');
+      fetchBookings();
+    } catch (err) {
+      showToast('Failed to submit review', 'error');
+      throw err;
+    }
   };
 
   const confirmPayment = async () => {
@@ -148,6 +188,7 @@ export default function BookingsPage() {
                 onPay={() => handlePay(booking)}
                 onCancel={handleCancel}
                 onReport={() => router.push('/disputes')}
+                onReview={() => handleReview(booking)}
               />
             ))
           ) : (
@@ -185,6 +226,13 @@ export default function BookingsPage() {
           </button>
         </div>
       </Modal>
+
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+        contractorName={selectedBooking?.contractor?.name || 'Contractor'}
+      />
     </div>
   );
 }
