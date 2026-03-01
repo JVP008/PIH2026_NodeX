@@ -73,8 +73,9 @@ export default function AIChatbot() {
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-gray-50">
             {messages.length === 0 && (
-              <div className="text-center text-gray-500 font-medium mt-10">
-                Hi! Looking for a professional? Ask me for a recommendation!
+              <div className="text-center text-gray-500 font-medium mt-10 px-2">
+                <p className="mb-2">👋 Hi! I know everything about this app.</p>
+                <p className="text-xs">Ask me about our contractors, services, bookings, or how to use HouseConnect Pro.</p>
               </div>
             )}
 
@@ -112,7 +113,7 @@ export default function AIChatbot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="E.g., Need a cheap plumber..."
+              placeholder="E.g., Show plumbers in Mumbai..."
               className="flex-1 p-2 border-2 border-black rounded-lg font-bold focus:outline-none focus:shadow-[2px_2px_0px_0px_#000]"
             />
             <button
