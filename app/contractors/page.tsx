@@ -2,15 +2,19 @@ import { supabase } from '@/lib/supabaseClient';
 import ContractorList from '@/components/contractors/ContractorList';
 import { seedContractors } from '@/lib/seedContractors';
 
-// Caching allowed for better performance
-
+// Caching disabled to ensure real-time contractor updates
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 export default async function ContractorsPage() {
   // Try to fetch from Supabase; fall back to seed data if it fails or returns nothing
   let contractors = seedContractors;
   try {
-    const { data } = await supabase.from('contractors').select('*');
+    const { data, error } = await supabase.from('contractors').select('*');
+    if (error) {
+      console.error("Supabase SSR Error on ContractorsPage:", error);
+    }
     if (data && data.length > 0) {
       // Deduplicate by name (case-insensitive and trimmed)
       const uniqueNames = new Set();

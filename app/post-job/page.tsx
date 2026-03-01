@@ -56,7 +56,12 @@ export default function PostJobPage() {
 
       if (error) {
         // Handle Postgres unique constraint violation for the mobile column
-        if (error.code === '23505' && error.message.includes('unique_mobile') || error.message.includes('contractors_mobile_key') || error.message.includes('mobile')) {
+        if (
+          error.code === '23505' &&
+          (error.message.includes('unique_mobile') ||
+            error.message.includes('contractors_mobile_key') ||
+            error.message.includes('mobile'))
+        ) {
           throw new Error('A professional with this mobile number is already registered!');
         }
         throw error;
@@ -153,7 +158,7 @@ export default function PostJobPage() {
               value={formData.mobile}
               onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
               className="w-full p-3 bg-white border-3 border-black rounded-lg focus:ring-0 focus:shadow-[4px_4px_0px_0px_#000] transition-all font-bold tracking-widest"
-              placeholder="E.g., +91 9876543210"
+              placeholder="E.g., +91 00000 00000"
               required
             />
           </div>

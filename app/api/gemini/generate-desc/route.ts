@@ -4,6 +4,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const apiKey = process.env.GEMINI_API_KEY;
 // Create AI client once; if key is missing, requests are rejected gracefully.
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const MAX_FIELD_LENGTH = 200;
+
+const normalizeText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 export async function POST(req: Request) {
   if (!genAI) {
@@ -16,11 +19,25 @@ export async function POST(req: Request) {
   try {
     // Read job details from frontend request.
     const { title, service, location } = await req.json();
+    const normalizedTitle = normalizeText(title);
+    const normalizedService = normalizeText(service);
+    const normalizedLocation = normalizeText(location);
 
     // We need service and location to generate useful, context-specific text.
-    if (!service || !location) {
+    if (!normalizedService || !normalizedLocation) {
       return NextResponse.json(
         { error: 'Service and location are required to generate a description.' },
+        { status: 400 }
+      );
+    }
+
+    if (
+      normalizedService.length > MAX_FIELD_LENGTH ||
+      normalizedLocation.length > MAX_FIELD_LENGTH ||
+      normalizedTitle.length > MAX_FIELD_LENGTH
+    ) {
+      return NextResponse.json(
+        { error: `Each input must be at most ${MAX_FIELD_LENGTH} characters.` },
         { status: 400 }
       );
     }
@@ -30,8 +47,8 @@ export async function POST(req: Request) {
 
     // Prompt tells the model to produce short, professional India-focused copy.
     const prompt = `Write a short, professional, 2-3 sentence description for a homeowner who wants to post a job on a modern contractor marketplace app in India. 
-The user needs a "${service}" professional located in "${location}". 
-${title ? `The title of their job is "${title}".` : ''}
+  The user needs a "${normalizedService}" professional located in "${normalizedLocation}". 
+  ${normalizedTitle ? `The title of their job is "${normalizedTitle}".` : ''}
 Make it sound polite, direct, and clear. Do not include placeholders or generic advice, just output the description itself.`;
 
     const result = await model.generateContent(prompt);

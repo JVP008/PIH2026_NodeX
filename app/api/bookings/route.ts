@@ -3,6 +3,11 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const allowedStatuses = new Set(['upcoming', 'completed', 'cancelled', 'pending']);
+
 export async function GET() {
   try {
     // Read bookings and include basic contractor info for UI cards.
@@ -24,8 +29,62 @@ export async function POST(request: Request) {
   try {
     // Read new booking payload sent by the browser.
     const body = await request.json();
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid booking payload' }, { status: 400 });
+    }
+
+    const {
+      contractor_id,
+      date,
+      time,
+      notes,
+      status,
+      price,
+      user_id,
+    } = body as Record<string, unknown>;
+
+    if (!isNonEmptyString(date) || !isNonEmptyString(time)) {
+      return NextResponse.json({ error: 'Date and time are required' }, { status: 400 });
+    }
+
+    const parsedContractorId =
+      typeof contractor_id === 'number'
+        ? contractor_id
+        : typeof contractor_id === 'string'
+          ? Number.parseInt(contractor_id, 10)
+          : null;
+
+    if (!Number.isInteger(parsedContractorId) || Number(parsedContractorId) <= 0) {
+      return NextResponse.json({ error: 'A valid contractor_id is required' }, { status: 400 });
+    }
+
+    if (status && (!isNonEmptyString(status) || !allowedStatuses.has(status))) {
+      return NextResponse.json({ error: 'Invalid booking status' }, { status: 400 });
+    }
+
+    if (price !== undefined && price !== null) {
+      const numericPrice = Number(price);
+      if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+        return NextResponse.json({ error: 'Price must be a non-negative number' }, { status: 400 });
+      }
+    }
+
+    const insertPayload = {
+      contractor_id: Number(parsedContractorId),
+      date: date.trim(),
+      time: time.trim(),
+      notes: isNonEmptyString(notes) ? notes.trim() : null,
+      status: isNonEmptyString(status) ? status : 'upcoming',
+      price: price === undefined || price === null ? null : Number(price),
+      user_id: isNonEmptyString(user_id) ? user_id : null,
+    };
+
     // Insert booking and return created row.
-    const { data, error: createError } = await supabase.from('bookings').insert([body]).select();
+    const { data, error: createError } = await supabase
+      .from('bookings')
+      .insert([insertPayload])
+      .select();
 
     if (createError) throw createError;
 

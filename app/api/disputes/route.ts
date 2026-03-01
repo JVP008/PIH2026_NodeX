@@ -3,6 +3,12 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const allowedDisputeTypes = new Set(['refund', 'quality', 'noshow', 'payment', 'other']);
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function GET() {
   try {
     // Fetch disputes with related booking and contractor context for support view.
@@ -23,8 +29,36 @@ export async function POST(request: Request) {
   try {
     // Parse dispute details from incoming request body.
     const body = await request.json();
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid dispute payload' }, { status: 400 });
+    }
+
+    const { booking_id, name, email, type, description, user_id } = body as Record<string, unknown>;
+
+    if (!isNonEmptyString(type) || !allowedDisputeTypes.has(type)) {
+      return NextResponse.json({ error: 'Invalid dispute type' }, { status: 400 });
+    }
+
+    if (!isNonEmptyString(description)) {
+      return NextResponse.json({ error: 'Description is required' }, { status: 400 });
+    }
+
+    if (email && (!isNonEmptyString(email) || !emailPattern.test(email.trim()))) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+    }
+
+    const insertPayload = {
+      booking_id: isNonEmptyString(booking_id) ? booking_id : null,
+      name: isNonEmptyString(name) ? name.trim() : null,
+      email: isNonEmptyString(email) ? email.trim().toLowerCase() : null,
+      type,
+      description: description.trim(),
+      user_id: isNonEmptyString(user_id) ? user_id : null,
+    };
+
     // Save dispute and return inserted record.
-    const { data, error } = await supabase.from('disputes').insert([body]).select();
+    const { data, error } = await supabase.from('disputes').insert([insertPayload]).select();
 
     if (error) throw error;
 

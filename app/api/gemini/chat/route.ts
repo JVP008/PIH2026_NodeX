@@ -5,6 +5,10 @@ import { supabase } from '@/lib/supabaseClient';
 const apiKey = process.env.GEMINI_API_KEY;
 // Build AI client once during module load for better performance.
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const MAX_MESSAGE_LENGTH = 1000;
+
+const isNonEmptyString = (value: unknown): value is string =>
+    typeof value === 'string' && value.trim().length > 0;
 
 export async function POST(req: Request) {
     if (!genAI) {
@@ -18,12 +22,31 @@ export async function POST(req: Request) {
         // Read user question from chat request payload.
         const { message } = await req.json();
 
-        if (!message) {
+        if (!isNonEmptyString(message)) {
             return NextResponse.json({ error: 'Message is required.' }, { status: 400 });
         }
 
+        const trimmedMessage = message.trim();
+
+        if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+            return NextResponse.json(
+                { error: `Message is too long. Maximum ${MAX_MESSAGE_LENGTH} characters allowed.` },
+                { status: 400 }
+            );
+        }
+
         // Fetch current contractor data so AI recommendations stay grounded.
-        const { data: contractors } = await supabase.from('contractors').select('*').limit(20);
+        const { data: contractors, error: contractorsError } = await supabase
+            .from('contractors')
+            .select('*')
+            .limit(20);
+
+        if (contractorsError) {
+            return NextResponse.json(
+                { error: 'Unable to fetch contractor data for recommendations right now.' },
+                { status: 503 }
+            );
+        }
 
         // Turn contractor records into plain text context for the AI prompt.
         const contextData = contractors
@@ -34,7 +57,7 @@ export async function POST(req: Request) {
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         const prompt = `You are a helpful assistant for "HouseConnect Pro", an Indian app that connects homeowners with local professionals.
-The user is asking: "${message}"
+    The user is asking: "${trimmedMessage}"
 
 Here is a list of our currently available professionals:
 ${contextData}

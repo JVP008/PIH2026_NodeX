@@ -63,6 +63,7 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [bookingDate, setBookingDate] = useState('');
     const [bookingTime, setBookingTime] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const fetchContractors = useCallback(async () => {
         // Reload contractors from database (used when initial list is empty or retry is clicked).
@@ -135,9 +136,24 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
             return;
         }
 
+        setIsSubmitting(true);
         try {
             // Read signed-in user so booking can be linked to that account.
             const user = (await supabase.auth.getUser()).data.user;
+
+            // Check if this timeslot is already booked to prevent duplicates
+            const { data: existingBookings } = await supabase
+                .from('bookings')
+                .select('id')
+                .eq('contractor_id', parseInt(selectedContractor.id) || null)
+                .eq('date', bookingDate)
+                .eq('time', bookingTime);
+
+            if (existingBookings && existingBookings.length > 0) {
+                showToast('This professional is already booked for this specific time slot.', 'error');
+                setIsSubmitting(false);
+                return;
+            }
 
             // Save booking into database.
             const { error: bookingError } = await supabase.from('bookings').insert([
@@ -162,10 +178,12 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
                 setIsScheduleModalOpen(false);
                 setBookingDate('');
                 setBookingTime('');
+                setIsSubmitting(false);
                 window.location.href = '/bookings';
             }, 1000);
         } catch {
             showToast('Failed to book pro. Please try again.', 'error');
+            setIsSubmitting(false);
         }
     };
 
@@ -311,9 +329,14 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
 
                 <button
                     onClick={confirmBooking}
-                    className="w-full bg-green-400 text-black border-3 border-black py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] hover:bg-green-500 transition-all text-xl uppercase"
+                    disabled={isSubmitting}
+                    className="w-full bg-green-400 text-black border-3 border-black py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] hover:bg-green-500 active:translate-y-[2px] active:shadow-none transition-all text-xl uppercase disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                 >
-                    Confirm Booking
+                    {isSubmitting ? (
+                        <><i className="fas fa-spinner fa-spin"></i> Processing...</>
+                    ) : (
+                        "Confirm Booking"
+                    )}
                 </button>
             </Modal>
         </div>
