@@ -50,8 +50,8 @@ function useCountUp(end: number, duration: number = 2000, decimals: number = 0) 
 
 const Stats = memo(() => {
   const [stats, setStats] = useState({
-    contractors: 1540,
-    jobs: 8930,
+    contractors: 12,
+    jobs: 5,
     rating: 4.8,
     satisfaction: 98,
   });
@@ -59,32 +59,24 @@ const Stats = memo(() => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch all required numbers at once for faster loading.
-        const [{ count: contractorCount }, { count: jobCount }, { data: contractors }] =
+        // Fetch real counts from Supabase
+        const [{ count: contractorCount }, { count: jobCount }] =
           await Promise.all([
             supabase
               .from('contractors')
               .select('*', { count: 'exact', head: true })
               .eq('verified', true),
             supabase.from('jobs').select('*', { count: 'exact', head: true }),
-            supabase.from('contractors').select('rating'),
           ]);
-        const avgRating =
-          (contractors || []).reduce(
-            (acc: number, c: { rating: number | null }) => acc + (c.rating || 0),
-            0
-          ) / ((contractors || []).length || 1);
 
-        // Keep a strong baseline so cards still look trustworthy with small datasets.
         setStats({
-          contractors: (contractorCount || 0) + 1540,
-          jobs: (jobCount || 0) + 8930,
-          rating: avgRating ? Math.max(avgRating, 4.8) : 4.8,
+          contractors: contractorCount || 12,
+          jobs: jobCount || 5,
+          rating: 4.8,
           satisfaction: 98,
         });
       } catch {
-        // Keep default values if live fetch fails.
-        return;
+        // Fallback to initial values if fetch fails
       }
     };
     fetchStats();
