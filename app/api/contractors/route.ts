@@ -3,13 +3,17 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Handle GET requests to fetch available contractors.
+ * Optionally filters by query param `?service=type`.
+ */
 export async function GET(request: Request) {
   try {
-    // Read optional query string (for example: ?service=plumbing).
     const { searchParams } = new URL(request.url);
     const service = searchParams.get('service');
 
-    // Start with all contractors, then narrow down if a service was requested.
+    // Build the Supabase query.
+    // Always start with selecting all contractors, then chain filters.
     let query = supabase.from('contractors').select('*');
 
     if (service) {
@@ -22,8 +26,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    // Return a stable error payload for frontend error toasts.
-    // eslint-disable-next-line no-console
     console.error('Error fetching contractors:', error);
     return NextResponse.json({ error: 'Error fetching contractors' }, { status: 500 });
   }

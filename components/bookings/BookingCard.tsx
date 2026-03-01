@@ -1,3 +1,22 @@
+import { Booking } from '@/types';
+
+// Moved outside component to prevent recreation on every render
+const STATUS_COLORS: Record<string, string> = {
+  upcoming: 'bg-blue-200',
+  completed: 'bg-green-200',
+  pending: 'bg-yellow-200',
+  cancelled: 'bg-red-200',
+};
+
+interface BookingCardProps {
+  // Use Partial and intersection to match exactly what is loaded from Supabase without deep modifications
+  booking: Booking;
+  onPay?: (booking: { id: string; price: number | null }) => void;
+  onCancel?: (id: string) => void;
+  onReport?: (booking: { id: string }) => void;
+  onReview?: (booking: { id: string; contractor: { name: string } | null }) => void;
+}
+
 /**
  * BookingCard Component
  *
@@ -11,30 +30,11 @@ export default function BookingCard({
   onCancel,
   onReport,
   onReview,
-}: {
-  booking: {
-    id: string;
-    date: string;
-    time: string;
-    status: string | null;
-    price: number | null;
-    contractor: {
-      name?: string | null;
-      image?: string | null;
-      service?: string | null;
-    } | null;
-  };
-  onPay?: (booking: { id: string; price: number | null }) => void;
-  onCancel?: (id: string) => void;
-  onReport?: (booking: { id: string }) => void;
-  onReview?: (booking: { id: string; contractor: { name: string } | null }) => void;
-}) {
-  const statusColors: Record<string, string> = {
-    upcoming: 'bg-blue-200',
-    completed: 'bg-green-200',
-    pending: 'bg-yellow-200',
-    cancelled: 'bg-red-200',
-  };
+}: BookingCardProps) {
+  const currentStatus = booking.status || 'pending';
+  const contractorName = booking.contractor?.name || 'Contractor';
+  // Use imported STATUS_COLORS, falling back to yellow/pending if unknown.
+  const statusColorClass = STATUS_COLORS[currentStatus] || STATUS_COLORS.pending;
 
   return (
     <div className="bg-white border-3 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_#000]">
@@ -42,28 +42,29 @@ export default function BookingCard({
         <div className="flex items-center gap-3">
           <span className="text-3xl">{booking.contractor?.image || '🔧'}</span>
           <div>
-            <h3 className="font-black text-lg">{booking.contractor?.name || 'Contractor'}</h3>
+            <h3 className="font-black text-lg">{contractorName}</h3>
             <p className="text-black font-medium text-sm">
               {new Date(booking.date).toLocaleDateString('en-IN')} • {booking.time}
             </p>
           </div>
         </div>
         <span
-          className={`px-3 py-1 border-2 border-black rounded-lg font-bold text-xs capitalize ${statusColors[booking.status || 'pending']} shadow-[2px_2px_0px_0px_#000]`}
+          className={`px-3 py-1 border-2 border-black rounded-lg font-bold text-xs capitalize ${statusColorClass} shadow-[2px_2px_0px_0px_#000]`}
         >
-          {booking.status || 'pending'}
+          {currentStatus}
         </span>
       </div>
+
       <div className="flex items-center justify-between border-t-2 border-dashed border-gray-300 pt-3">
         <span className="font-black text-lg">₹{booking.price || 0}</span>
         <div className="flex gap-2">
-          {booking.status === 'upcoming' && (
+          {currentStatus === 'upcoming' && (
             <>
               <button
                 onClick={() => onPay?.({ id: booking.id, price: booking.price })}
                 className="px-3 py-1 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
               >
-                Pay ₹{booking.price}
+                Pay ₹{booking.price || 0}
               </button>
               <button
                 onClick={() => onCancel?.(booking.id)}
@@ -73,13 +74,14 @@ export default function BookingCard({
               </button>
             </>
           )}
-          {booking.status === 'completed' && (
+
+          {currentStatus === 'completed' && (
             <>
               <button
                 onClick={() =>
                   onReview?.({
                     id: booking.id,
-                    contractor: { name: booking.contractor?.name || 'Contractor' },
+                    contractor: { name: contractorName },
                   })
                 }
                 className="px-3 py-1 bg-yellow-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"

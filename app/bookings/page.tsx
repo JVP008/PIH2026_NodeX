@@ -9,29 +9,19 @@ import Modal from '@/components/ui/Modal';
 import BookingCard from '@/components/bookings/BookingCard';
 import ReviewModal from '@/components/bookings/ReviewModal';
 
-interface BookingRow {
-  id: string;
-  user_id: string | null;
-  contractor_id: number | null;
-  date: string;
-  time: string;
-  status: string | null;
-  price: number | null;
-  notes: string | null;
-  contractor: { name: string; image: string | null; service: string | null } | null;
-}
+import { Booking } from '@/types';
 
 export default function BookingsPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  const refreshContractorAvailability = useCallback(async (contractorId: number | null) => {
+  const refreshContractorAvailability = useCallback(async (contractorId: string | null) => {
     if (!contractorId) return;
 
     // Contractor is available only if there are no upcoming/pending bookings for them.
@@ -73,7 +63,8 @@ export default function BookingsPage() {
         throw error;
       }
 
-      setBookings(data || []);
+      // Assume the database response shape conforms to strict Booking array structure
+      setBookings((data as unknown as Booking[]) || []);
     } catch {
       // If anything fails, tell the user in plain language.
       showToast('Failed to load bookings. Please check your connection.', 'error');
@@ -109,13 +100,13 @@ export default function BookingsPage() {
     fetchBookings();
   };
 
-  const handlePay = (booking: BookingRow) => {
+  const handlePay = (booking: Booking) => {
     // Save the booking user picked, then open the payment confirmation dialog.
     setSelectedBooking(booking);
     setPayModalOpen(true);
   };
 
-  const handleReview = (booking: BookingRow) => {
+  const handleReview = (booking: Booking) => {
     setSelectedBooking(booking);
     setReviewModalOpen(true);
   };

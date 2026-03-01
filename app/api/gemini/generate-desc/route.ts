@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { normalizeText } from '@/lib/utils';
+import { GenerateDescPayload } from '@/types/api';
 
 const apiKey = process.env.GEMINI_API_KEY;
 // Create AI client once; if key is missing, we use a local fallback generator.
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 const MAX_FIELD_LENGTH = 200;
-
-const normalizeText = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 const buildFallbackDescription = ({
   title,
@@ -24,13 +24,23 @@ const buildFallbackDescription = ({
   return `${intro} Professional, on-time work with clear pricing and quality-focused execution for homes and small businesses.`;
 };
 
+/**
+ * Handle POST requests to generate a job description using Gemini AI.
+ * Falls back to a generic description if no API key is present or on failure.
+ */
 export async function POST(req: Request) {
   try {
-    // Read job details from frontend request.
-    const { title, service, location } = await req.json();
-    const normalizedTitle = normalizeText(title);
-    const normalizedService = normalizeText(service);
-    const normalizedLocation = normalizeText(location);
+    const body = await req.json();
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    const payload = body as GenerateDescPayload;
+
+    const normalizedTitle = normalizeText(payload.title) || '';
+    const normalizedService = normalizeText(payload.service) || '';
+    const normalizedLocation = normalizeText(payload.location) || '';
 
     // We need service and location to generate useful, context-specific text.
     if (!normalizedService || !normalizedLocation) {

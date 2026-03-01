@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 
+const RATING_OPTIONS = [1, 2, 3, 4, 5];
+
 interface ReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,9 +45,10 @@ export default function ReviewModal({
       </div>
 
       <div className="flex justify-center gap-2 mb-6">
-        {[1, 2, 3, 4, 5].map((num) => (
+        {RATING_OPTIONS.map((num) => (
           <button
             key={num}
+            type="button"
             onClick={() => setRating(num)}
             className={`text-4xl transition-all hover:scale-110 ${
               num <= rating ? 'text-yellow-400' : 'text-gray-300'

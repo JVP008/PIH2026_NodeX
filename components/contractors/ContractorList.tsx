@@ -4,12 +4,21 @@ import { Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
-import Modal from '@/components/ui/Modal';
 import ContractorCard from './ContractorCard';
+import BookingModal from './BookingModal';
 
 import { Contractor } from '@/types';
 
-const services = ['All', 'Plumbing', 'Electrical', 'Cleaning', 'HVAC', 'Painting', 'Landscaping'];
+const services = [
+  'All',
+  'Plumbing',
+  'Electrical',
+  'Cleaning',
+  'HVAC',
+  'Painting',
+  'Landscaping',
+  'Tailor',
+];
 
 function SkeletonCard() {
   // Placeholder card shown while real contractor data is still loading.
@@ -58,12 +67,9 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  // These values control the booking popup and selected time slot.
+  // These values control the booking popup
   const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchContractors = useCallback(async () => {
     // Reload contractors from database.
@@ -127,64 +133,14 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
     setIsScheduleModalOpen(true);
   };
 
-  const confirmBooking = async () => {
-    // Require both date and time before sending booking request.
-    if (!bookingDate || !bookingTime || !selectedContractor) {
-      showToast('Please select date and time', 'error');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const contractorId = Number.parseInt(selectedContractor.id, 10);
-      if (!Number.isInteger(contractorId) || contractorId <= 0) {
-        throw new Error('Invalid contractor selected.');
-      }
-
-      // Read signed-in user so booking can be linked to that account.
-      const user = (await supabase.auth.getUser()).data.user;
-
-      const bookingResponse = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contractor_id: contractorId,
-          date: bookingDate,
-          time: bookingTime,
-          status: 'upcoming',
-          price:
-            Number.parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, ''), 10) || 500,
-          user_id: user?.id || null,
-        }),
-      });
-
-      const bookingResult = await bookingResponse.json();
-      if (!bookingResponse.ok) {
-        throw new Error(bookingResult.error || 'Failed to create booking');
-      }
-
-      // Update list state immediately so the badge/button reflect latest availability.
-      setContractors((prev) =>
-        prev.map((contractor) =>
-          Number(contractor.id) === contractorId ? { ...contractor, available: false } : contractor
-        )
-      );
-
-      showToast(`Booking confirmed! Redirecting to your bookings...`);
-
-      // Close modal, reset form values, then move user to bookings page.
-      setTimeout(() => {
-        setIsScheduleModalOpen(false);
-        setBookingDate('');
-        setBookingTime('');
-        setIsSubmitting(false);
-        window.location.href = '/bookings';
-      }, 1000);
-    } catch {
-      showToast('Failed to book pro. Please try again.', 'error');
-      setIsSubmitting(false);
-    }
-  };
+  const handleBookingSuccess = useCallback((contractorId: number) => {
+    // Update list state immediately so the badge/button reflect latest availability.
+    setContractors((prev) =>
+      prev.map((contractor) =>
+        Number(contractor.id) === contractorId ? { ...contractor, available: false } : contractor
+      )
+    );
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -283,63 +239,12 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </>
       )}
 
-      <Modal
+      <BookingModal
         isOpen={isScheduleModalOpen}
         onClose={() => setIsScheduleModalOpen(false)}
-        title="Schedule Appointment"
-      >
-        <div className="flex items-center mb-6 pb-6 border-b-2 border-dashed border-gray-300">
-          <div className="text-5xl mr-4 filter drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
-            {selectedContractor?.image}
-          </div>
-          <div>
-            <h4 className="font-black text-xl">{selectedContractor?.name}</h4>
-            <p className="text-black font-medium">
-              {selectedContractor?.service} • {selectedContractor?.price}
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-black font-black mb-2 uppercase">Select Date</label>
-          <input
-            type="date"
-            value={bookingDate}
-            onChange={(e) => setBookingDate(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
-            className="w-full p-3 bg-white border-3 border-black rounded-lg focus:ring-0 focus:shadow-[4px_4px_0px_0px_#000] transition-all font-bold"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-black font-black mb-2 uppercase">Select Time Slot</label>
-          <div className="grid grid-cols-3 gap-2">
-            {['Morning (9AM–12PM)', 'Afternoon (12PM–5PM)', 'Evening (5PM–8PM)'].map((slot) => (
-              <button
-                key={slot}
-                onClick={() => setBookingTime(slot)}
-                className={`p-3 text-sm border-2 border-black rounded-lg font-bold transition-all ${bookingTime === slot ? 'bg-blue-400 text-black shadow-[2px_2px_0px_0px_#000]' : 'bg-white hover:bg-gray-50'}`}
-              >
-                {slot}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button
-          onClick={confirmBooking}
-          disabled={isSubmitting}
-          className="w-full bg-green-400 text-black border-3 border-black py-4 rounded-lg font-black shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000] hover:bg-green-500 active:translate-y-[2px] active:shadow-none transition-all text-xl uppercase disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-        >
-          {isSubmitting ? (
-            <>
-              <i className="fas fa-spinner fa-spin"></i> Processing...
-            </>
-          ) : (
-            'Confirm Booking'
-          )}
-        </button>
-      </Modal>
+        contractor={selectedContractor}
+        onSuccess={handleBookingSuccess}
+      />
     </div>
   );
 }

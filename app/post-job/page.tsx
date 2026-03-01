@@ -6,7 +6,15 @@ import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
 
-const CATEGORIES = ['Plumbing', 'Electrical', 'Cleaning', 'HVAC', 'Painting', 'Landscaping'];
+const CATEGORIES = [
+  'Plumbing',
+  'Electrical',
+  'Cleaning',
+  'HVAC',
+  'Painting',
+  'Landscaping',
+  'Tailor',
+];
 
 export default function PostJobPage() {
   const router = useRouter();

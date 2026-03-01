@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import { isNonEmptyString, normalizeText } from '@/lib/utils';
+import { normalizeText } from '@/lib/utils';
+import { JobPayload } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Handle POST requests to post a new job request.
+ * Normalizes inputs and ensures all mandatory fields exist.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -12,13 +17,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid job payload' }, { status: 400 });
     }
 
-    const { user_id, title, service, category, description, location, budget, status, urgency } =
-      body as Record<string, unknown>;
+    const payload = body as JobPayload;
 
-    const normalizedDescription = normalizeText(description);
-    const normalizedLocation = normalizeText(location);
-    const normalizedService = normalizeText(service);
-    const normalizedCategory = normalizeText(category);
+    const normalizedDescription = normalizeText(payload.description);
+    const normalizedLocation = normalizeText(payload.location);
+    const normalizedService = normalizeText(payload.service);
+    const normalizedCategory = normalizeText(payload.category);
 
     if (
       !normalizedDescription ||
@@ -31,19 +35,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const payload = {
-      user_id: normalizeText(user_id),
-      title: normalizeText(title),
+    const insertPayload = {
+      user_id: normalizeText(payload.user_id),
+      title: normalizeText(payload.title),
       service: normalizedService ?? normalizedCategory ?? 'General',
       category: normalizedCategory ?? normalizedService ?? 'General',
       description: normalizedDescription,
       location: normalizedLocation,
-      budget: normalizeText(budget),
-      status: normalizeText(status) ?? normalizeText(urgency) ?? 'open',
-      urgency: normalizeText(urgency) ?? 'flexible',
+      budget: normalizeText(payload.budget),
+      status: normalizeText(payload.status) ?? normalizeText(payload.urgency) ?? 'open',
+      urgency: normalizeText(payload.urgency) ?? 'flexible',
     };
 
-    const { data, error } = await supabase.from('jobs').insert([payload]).select();
+    // Insert new job mapping
+    const { data, error } = await supabase.from('jobs').insert([insertPayload]).select();
 
     if (error) throw error;
 

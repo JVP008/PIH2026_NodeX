@@ -15,6 +15,7 @@ export interface Booking extends Omit<Database['public']['Tables']['bookings']['
   contractor?: {
     name: string;
     image: string | null;
+    service?: string | null;
   };
   service?: string;
 }

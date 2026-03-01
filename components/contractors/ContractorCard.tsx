@@ -4,6 +4,28 @@ import { memo } from 'react';
 import Link from 'next/link';
 import { Contractor } from '@/types';
 
+// Map database service strings to corresponding emojis for UI rendering
+const SERVICE_EMOJIS: Record<string, string> = {
+  Plumbing: '👨‍🔧',
+  Electrical: '⚡',
+  Cleaning: '🧹',
+  Painting: '👨‍🎨',
+  HVAC: '❄️',
+  Landscaping: '🌳',
+  Tailor: '✂️',
+  General: '👷‍♂️',
+};
+
+/**
+ * Helper to determine the best display emoji for a given contractor.
+ */
+function getContractorEmoji(contractor: Contractor): string {
+  if (contractor.image) return contractor.image;
+  return contractor.service && SERVICE_EMOJIS[contractor.service]
+    ? SERVICE_EMOJIS[contractor.service]
+    : '👷‍♂️';
+}
+
 interface ContractorCardProps {
   contractor: Contractor;
   onBook: (contractor: Contractor) => void;
@@ -20,20 +42,7 @@ const ContractorCard = memo(({ contractor, onBook }: ContractorCardProps) => {
     <div className="bg-white border-3 border-black rounded-xl shadow-[6px_6px_0px_0px_#000] p-6 hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_0px_#000] transition-all flex flex-col h-full">
       <div className="flex items-start gap-4 flex-1">
         <div className="text-5xl shrink-0 filter drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] bg-gray-50 border-2 border-black rounded-full w-20 h-20 flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
-          {contractor.image ||
-            (contractor.service === 'Plumbing'
-              ? '👨‍🔧'
-              : contractor.service === 'Electrical'
-                ? '⚡'
-                : contractor.service === 'Cleaning'
-                  ? '🧹'
-                  : contractor.service === 'Painting'
-                    ? '👨‍🎨'
-                    : contractor.service === 'HVAC'
-                      ? '❄️'
-                      : contractor.service === 'Landscaping'
-                        ? '🌳'
-                        : '👷‍♂️')}
+          {getContractorEmoji(contractor)}
         </div>
         <div className="flex-1 min-w-0 flex flex-col h-full">
           <div className="flex items-start justify-between gap-4">

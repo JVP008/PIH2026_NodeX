@@ -6,15 +6,7 @@ import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
 import DisputeCard from '@/components/disputes/DisputeCard';
 
-interface Dispute {
-  id: string;
-  name: string | null;
-  email: string | null;
-  type: string;
-  description: string;
-  status: string | null;
-  created_at: string;
-}
+import { Dispute } from '@/types';
 
 export default function DisputesPage() {
   const { showToast } = useToast();

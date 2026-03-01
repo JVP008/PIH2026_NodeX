@@ -24,6 +24,7 @@ export default function Services() {
     { name: 'HVAC', icon: 'fa-fan', color: 'cyan' },
     { name: 'Painting', icon: 'fa-paint-roller', color: 'pink' },
     { name: 'Landscaping', icon: 'fa-leaf', color: 'emerald' },
+    { name: 'Tailor', icon: 'fa-scissors', color: 'purple' },
   ];
 
   return (

@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import { isNonEmptyString } from '@/lib/utils';
+import { normalizeText } from '@/lib/utils';
+import { DisputePayload } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
 
 const allowedDisputeTypes = new Set(['refund', 'quality', 'noshow', 'payment', 'other']);
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Handle GET requests to fetch all disputes and their related contexts.
+ * Contains relations for booking details and contractor information.
+ */
 export async function GET() {
   try {
-    // Fetch disputes with related booking and contractor context for support view.
     const { data, error } = await supabase
       .from('disputes')
       .select('*, booking:bookings(time, date, contractor:contractors(name, service))');
@@ -23,6 +27,10 @@ export async function GET() {
   }
 }
 
+/**
+ * Handle POST requests to submit a new dispute.
+ * Includes strict validation for types, emails, and mandatory descriptions.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -31,38 +39,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid dispute payload' }, { status: 400 });
     }
 
-    const { booking_id, name, email, type, description, user_id } = body as Record<string, unknown>;
+    const payload = body as DisputePayload;
 
-    if (!isNonEmptyString(type) || !allowedDisputeTypes.has(type)) {
+    const type = normalizeText(payload.type);
+    if (!type || !allowedDisputeTypes.has(type)) {
       return NextResponse.json({ error: 'Invalid dispute type' }, { status: 400 });
     }
 
-    if (!isNonEmptyString(description)) {
+    const description = normalizeText(payload.description);
+    if (!description) {
       return NextResponse.json({ error: 'Description is required' }, { status: 400 });
     }
 
-    if (email && (!isNonEmptyString(email) || !emailPattern.test(email.trim()))) {
+    const email = normalizeText(payload.email);
+    if (email && !emailPattern.test(email)) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
     const insertPayload = {
-      booking_id: isNonEmptyString(booking_id) ? booking_id : null,
-      name: isNonEmptyString(name) ? name.trim() : null,
-      email: isNonEmptyString(email) ? email.trim().toLowerCase() : null,
+      booking_id: normalizeText(payload.booking_id),
+      name: normalizeText(payload.name),
+      email: email ? email.toLowerCase() : null,
       type,
-      description: description.trim(),
-      user_id: isNonEmptyString(user_id) ? user_id : null,
+      description,
+      user_id: normalizeText(payload.user_id),
     };
 
-    // Save dispute and return inserted record.
+    // Save dispute and return inserted record
     const { data, error } = await supabase.from('disputes').insert([insertPayload]).select();
 
     if (error) throw error;
 
     return NextResponse.json({ data });
   } catch (error) {
-    // Return clear failure message if database insert fails.
-    // eslint-disable-next-line no-console
     console.error('Error creating dispute:', error);
     return NextResponse.json({ error: 'Error creating dispute' }, { status: 500 });
   }

@@ -9,7 +9,15 @@ const MAX_MESSAGE_LENGTH = 1000;
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
-const SERVICE_LIST = ['Plumbing', 'Electrical', 'Cleaning', 'HVAC', 'Painting', 'Landscaping'];
+const SERVICE_LIST = [
+  'Plumbing',
+  'Electrical',
+  'Cleaning',
+  'HVAC',
+  'Painting',
+  'Landscaping',
+  'Tailor',
+];
 
 const APP_FEATURES = `
 App name: HouseConnect Pro

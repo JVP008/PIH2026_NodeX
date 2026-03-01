@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { isNonEmptyString, normalizeText } from '@/lib/utils';
+import { BookingPayload } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0;
-
 const allowedStatuses = new Set(['upcoming', 'completed', 'cancelled', 'pending']);
 
+/**
+ * Handle GET requests to fetch all bookings with contractor info.
+ * Provides a sorted list for UI display.
+ */
 export async function GET() {
   try {
-    // Read bookings and include basic contractor info for UI cards.
     const { data, error: fetchError } = await supabase
       .from('bookings')
       .select('*, contractor:contractors(name, image)')
@@ -20,71 +22,79 @@ export async function GET() {
 
     return NextResponse.json({ data });
   } catch (error) {
-    // Return a clear server error message when fetch fails.
-    // eslint-disable-next-line no-console
     console.error('Error fetching bookings:', error);
     return NextResponse.json({ error: 'Error fetching bookings' }, { status: 500 });
   }
 }
 
+/**
+ * Handle POST requests to create a new booking.
+ * Validates payload, checks contractor availability, and registers the booking.
+ */
 export async function POST(request: Request) {
   try {
-    // Read new booking payload sent by the browser.
     const body = await request.json();
 
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'Invalid booking payload' }, { status: 400 });
     }
 
-    const { contractor_id, date, time, notes, status, price, user_id } = body as Record<
-      string,
-      unknown
-    >;
+    const payload = body as BookingPayload;
 
-    if (!isNonEmptyString(date) || !isNonEmptyString(time)) {
+    // Validate required datetime fields
+    const date = normalizeText(payload.date);
+    const time = normalizeText(payload.time);
+
+    if (!date || !time) {
       return NextResponse.json({ error: 'Date and time are required' }, { status: 400 });
     }
 
+    // Safely parse contractor ID to integer
     const parsedContractorId =
-      typeof contractor_id === 'number'
-        ? contractor_id
-        : typeof contractor_id === 'string'
-          ? Number.parseInt(contractor_id, 10)
+      typeof payload.contractor_id === 'number'
+        ? payload.contractor_id
+        : typeof payload.contractor_id === 'string'
+          ? Number.parseInt(payload.contractor_id, 10)
           : null;
 
     if (!Number.isInteger(parsedContractorId) || Number(parsedContractorId) <= 0) {
       return NextResponse.json({ error: 'A valid contractor_id is required' }, { status: 400 });
     }
 
-    if (status && (!isNonEmptyString(status) || !allowedStatuses.has(status))) {
+    // Validate optional status
+    const status = normalizeText(payload.status);
+    if (status && !allowedStatuses.has(status)) {
       return NextResponse.json({ error: 'Invalid booking status' }, { status: 400 });
     }
 
-    if (price !== undefined && price !== null) {
-      const numericPrice = Number(price);
+    // Validate optional price
+    let finalPrice: number | null = null;
+    if (payload.price !== undefined && payload.price !== null) {
+      const numericPrice = Number(payload.price);
       if (!Number.isFinite(numericPrice) || numericPrice < 0) {
         return NextResponse.json({ error: 'Price must be a non-negative number' }, { status: 400 });
       }
+      finalPrice = numericPrice;
     }
 
     const insertPayload = {
       contractor_id: Number(parsedContractorId),
-      date: date.trim(),
-      time: time.trim(),
-      notes: isNonEmptyString(notes) ? notes.trim() : null,
-      status: isNonEmptyString(status) ? status : 'upcoming',
-      price: price === undefined || price === null ? null : Number(price),
-      user_id: isNonEmptyString(user_id) ? user_id : null,
+      date,
+      time,
+      notes: normalizeText(payload.notes),
+      status: status || 'upcoming',
+      price: finalPrice,
+      user_id: normalizeText(payload.user_id),
     };
 
-    // Prevent double-booking the same professional for the same date/time
-    // while allowing re-booking when previous slots were cancelled/completed.
+    // Prevent double-booking the professional for the same exact date/time
+    // Allows re-booking if the previous conflicting slot was cancelled/completed
     const { data: existingSlots, error: existingSlotError } = await supabase
       .from('bookings')
       .select('id')
-      .eq('contractor_id', Number(parsedContractorId))
-      .eq('date', date.trim())
-      .eq('time', time.trim())
+      .eq('contractor_id', insertPayload.contractor_id)
+      .eq('date', insertPayload.date)
+      .eq('time', insertPayload.time)
       .in('status', ['upcoming', 'pending'])
       .limit(1);
 
@@ -99,7 +109,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insert booking and return created row.
+    // Insert booking into the database
     const { data, error: createError } = await supabase
       .from('bookings')
       .insert([insertPayload])
@@ -107,12 +117,12 @@ export async function POST(request: Request) {
 
     if (createError) throw createError;
 
-    // Mark the professional busy after a successful active booking.
+    // Immediately mark the professional as unavailable if the newly created booking occupies them
     if (insertPayload.status === 'upcoming' || insertPayload.status === 'pending') {
       const { error: availabilityError } = await supabase
         .from('contractors')
         .update({ available: false })
-        .eq('id', Number(parsedContractorId));
+        .eq('id', insertPayload.contractor_id);
 
       if (availabilityError) {
         throw availabilityError;
@@ -121,8 +131,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    // Send a predictable error shape for frontend handling.
-    // eslint-disable-next-line no-console
     console.error('Error creating booking:', error);
     return NextResponse.json({ error: 'Error creating booking' }, { status: 500 });
   }
