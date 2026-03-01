@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import { seedContractors } from '@/lib/seedContractors';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -10,13 +11,16 @@ export default async function ContractorDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data: contractor, error } = await supabase
+
+  const { data: dbContractor } = await supabase
     .from('contractors')
     .select('*')
     .eq('id', id)
     .single();
 
-  if (error || !contractor) {
+  const contractor = dbContractor ?? seedContractors.find((c) => c.id === id);
+
+  if (!contractor) {
     notFound();
   }
 
