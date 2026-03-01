@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
@@ -16,12 +16,6 @@ interface Dispute {
   created_at: string;
 }
 
-/**
- * DisputesPage Component
- *
- * This page allows users to report issues with a booking (like a no-show or poor quality work).
- * It features a form to submit a new dispute and a list showing recently submitted disputes.
- */
 export default function DisputesPage() {
   const { showToast } = useToast();
   const [disputes, setDisputes] = useState<Dispute[]>([]);
@@ -36,14 +30,12 @@ export default function DisputesPage() {
     description: '',
   });
 
-  useEffect(() => {
-    fetchDisputes();
-  }, []);
-
-  // This function retrieves the 10 most recent disputes from the database.
-  const fetchDisputes = async () => {
+  // Get recent disputes so users can see what was already reported.
+  const fetchDisputes = useCallback(async () => {
+    // Show skeleton cards while loading data.
     setLoading(true);
     try {
+      // Fetch newest disputes first and keep the list short for readability.
       const { data, error } = await supabase
         .from('disputes')
         .select('*')
@@ -52,23 +44,30 @@ export default function DisputesPage() {
       if (error) throw error;
       setDisputes(data || []);
     } catch {
+      // Friendly message when the list cannot be loaded.
       showToast('Failed to load disputes', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
-  // This function runs when the user clicks "Submit Dispute".
-  // It validates the form, saves the dispute to the database, and clears the form upon success.
+  useEffect(() => {
+    // Load the list when this page first appears.
+    fetchDisputes();
+  }, [fetchDisputes]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Basic validation so empty reports are not submitted.
     if (!form.name || !form.type || !form.description) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
 
+    // Disable submit button to prevent duplicate clicks.
     setSubmitting(true);
     try {
+      // Save the dispute details into Supabase.
       const { error } = await supabase.from('disputes').insert([
         {
           name: form.name,
@@ -81,7 +80,9 @@ export default function DisputesPage() {
 
       if (error) throw error;
       showToast('Dispute submitted! Our team will review it within 24 hours.');
+      // Clear the form after successful submission.
       setForm({ name: '', email: '', bookingId: '', type: 'quality', description: '' });
+      // Refresh list so the new dispute appears right away.
       fetchDisputes();
     } catch {
       showToast('Failed to submit dispute', 'error');
@@ -103,7 +104,6 @@ export default function DisputesPage() {
         Have a problem with a booking? Let us know and we&apos;ll resolve it within 24 hours.
       </p>
 
-      {/* Dispute Form */}
       <form
         onSubmit={handleSubmit}
         className="bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_#000] p-8 mb-12"
@@ -192,7 +192,6 @@ export default function DisputesPage() {
         </button>
       </form>
 
-      {/* Recent Disputes */}
       <h2 className="text-2xl font-black uppercase tracking-tight mb-4">Recent Disputes</h2>
       {loading ? (
         <div className="space-y-3">

@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useCallback, useEffect, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabaseClient';
 import Modal from '@/components/ui/Modal';
@@ -12,6 +12,7 @@ import { Contractor } from '@/types';
 const services = ['All', 'Plumbing', 'Electrical', 'Cleaning', 'HVAC', 'Painting', 'Landscaping'];
 
 function SkeletonCard() {
+  // Placeholder card shown while real contractor data is still loading.
   return (
     <div className="bg-white border-3 border-black rounded-xl p-6 animate-pulse shadow-[4px_4px_0px_0px_#ccc]">
       <div className="flex items-center mb-4">
@@ -57,21 +58,14 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Schedule Modal
+  // These values control the booking popup and selected time slot.
   const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
-  useEffect(() => {
-    if (initialContractors.length === 0) {
-      fetchContractors();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialContractors.length]);
 
-  // Function to download the latest contractor list directly from our database.
-  // We use this if the initial list is empty or if we need fresh data.
-  const fetchContractors = async () => {
+  const fetchContractors = useCallback(async () => {
+    // Reload contractors from database (used when initial list is empty or retry is clicked).
     setLoading(true);
     setError(null);
     try {
@@ -84,15 +78,21 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    // Only fetch from browser if server did not provide initial data.
+    if (initialContractors.length === 0) {
+      fetchContractors();
+    }
+  }, [initialContractors.length, fetchContractors]);
 
   const handleFilter = useCallback((service: string) => {
     setActiveFilter(service);
   }, []);
 
-  // 'useMemo' remembers the filtered list so we don't recalculate it unless
-  // the contractors change, or the user types a new search/filter/sort option.
   const filtered = useMemo(
+    // Build the visible list using active category, search text, and sort option.
     () =>
       contractors
         .filter((c) => activeFilter === 'All' || c.service?.toLowerCase() === activeFilter.toLowerCase())
@@ -113,21 +113,23 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
   );
 
   const handleBook = (contractor: Contractor) => {
+    // Open booking modal for the chosen contractor.
     setSelectedContractor(contractor);
     setIsScheduleModalOpen(true);
   };
 
-  // This runs when the user finally clicks the big green "Confirm Booking" button in the pop-up.
   const confirmBooking = async () => {
+    // Require both date and time before sending booking request.
     if (!bookingDate || !bookingTime || !selectedContractor) {
       showToast('Please select date and time', 'error');
       return;
     }
 
     try {
-      // Grab the logged-in user from the database session securely
+      // Read signed-in user so booking can be linked to that account.
       const user = (await supabase.auth.getUser()).data.user;
 
+      // Save booking into database.
       const { error: bookingError } = await supabase.from('bookings').insert([
         {
           contractor_id: parseInt(selectedContractor.id) || null,
@@ -145,14 +147,14 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
 
       showToast(`Booking confirmed! Redirecting to your bookings...`);
 
-      // Clean up and redirect
+      // Close modal, reset form values, then move user to bookings page.
       setTimeout(() => {
         setIsScheduleModalOpen(false);
         setBookingDate('');
         setBookingTime('');
         window.location.href = '/bookings';
       }, 1000);
-    } catch (err) {
+    } catch {
       showToast('Failed to book pro. Please try again.', 'error');
     }
   };
@@ -163,7 +165,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         Find Your Pro
       </h2>
 
-      {/* Search Bar */}
       <div className="max-w-xl mx-auto mb-6">
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
@@ -185,7 +186,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2 justify-center mb-4">
         {services.map((service) => (
           <button
@@ -198,7 +198,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         ))}
       </div>
 
-      {/* Sort */}
       <div className="flex justify-end mb-6">
         <select
           value={sortBy}
@@ -211,7 +210,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </select>
       </div>
 
-      {/* Error State */}
       {error && (
         <div className="bg-red-100 border-3 border-black rounded-xl p-6 text-center mb-6 shadow-[4px_4px_0px_0px_#000]">
           <i className="fas fa-exclamation-triangle text-3xl text-red-500 mb-2"></i>
@@ -225,7 +223,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </div>
       )}
 
-      {/* Loading Skeleton */}
       {loading && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
@@ -234,7 +231,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </div>
       )}
 
-      {/* Contractor Grid */}
       {!loading && !error && (
         <>
           <p className="text-center text-black font-bold mb-4">
@@ -260,7 +256,6 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
         </>
       )}
 
-      {/* Booking Modal */}
       <Modal
         isOpen={isScheduleModalOpen}
         onClose={() => setIsScheduleModalOpen(false)}

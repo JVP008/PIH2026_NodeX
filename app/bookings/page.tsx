@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/Toast';
@@ -18,13 +18,6 @@ interface BookingRow {
   contractor: { name: string; image: string | null; service: string | null } | null;
 }
 
-/**
- * BookingsPage Component
- *
- * This page shows a list of all your past and upcoming bookings with professionals.
- * You can filter them by status (upcoming, completed, cancelled) and even pay for upcoming ones
- * directly from here using the pop-up payment modal.
- */
 export default function BookingsPage() {
   const router = useRouter();
   const { showToast } = useToast();
@@ -34,29 +27,16 @@ export default function BookingsPage() {
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
-  // This function fetches your bookings straight from the Supabase database.
-  // It also retrieves the contractor's name and image for each booking.
-  const fetchBookings = async () => {
+  // Get the latest booking list from the database so the page stays up to date.
+  const fetchBookings = useCallback(async () => {
+    // Show loading placeholders while data is being requested.
     setLoading(true);
     try {
-      // Get current user to possibly filter, but for demo we show all or user's
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      // Ask Supabase for bookings and include contractor details in the same request.
       const query = supabase
         .from('bookings')
         .select('*, contractor:contractors(name, image, service)')
         .order('created_at', { ascending: false });
-
-      // If we wanted to filter by user:
-      // if (user) {
-      //     query = query.eq('user_id', user.id);
-      // }
 
       const { data, error } = await query;
 
@@ -65,14 +45,22 @@ export default function BookingsPage() {
       }
 
       setBookings(data || []);
-    } catch (err) {
+    } catch {
+      // If anything fails, tell the user in plain language.
       showToast('Failed to load bookings. Please check your connection.', 'error');
     } finally {
+      // Always stop loading, whether success or failure.
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    // Load bookings once when the page opens.
+    fetchBookings();
+  }, [fetchBookings]);
 
   const handleCancel = async (id: string) => {
+    // Mark a booking as cancelled instead of deleting it, so records stay traceable.
     const { error } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id);
 
     if (error) {
@@ -84,14 +72,16 @@ export default function BookingsPage() {
   };
 
   const handlePay = (booking: BookingRow) => {
+    // Save the booking user picked, then open the payment confirmation dialog.
     setSelectedBooking(booking);
     setPayModalOpen(true);
   };
 
-  // This runs when you click the final "Pay" button inside the payment pop-up.
-  // In a real app, this would connect to a payment gateway. Here, it just marks it as "completed".
   const confirmPayment = async () => {
+    // Nothing to process if no booking is selected.
     if (!selectedBooking) return;
+
+    // Demo payment flow: switch booking status to completed.
     const { error } = await supabase
       .from('bookings')
       .update({ status: 'completed' })
@@ -104,9 +94,11 @@ export default function BookingsPage() {
 
     setPayModalOpen(false);
     showToast('Payment successful! (Demo)');
+    // Reload bookings so the new status appears immediately.
     fetchBookings();
   };
 
+  // Only show rows that match the selected tab (all/upcoming/completed/etc.).
   const filtered = bookings.filter((b) => filter === 'all' || b.status === filter);
 
   return (
@@ -119,7 +111,6 @@ export default function BookingsPage() {
       </Link>
       <h1 className="text-4xl font-black uppercase tracking-tight mb-6">My Bookings</h1>
 
-      {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         {['all', 'upcoming', 'completed', 'pending', 'cancelled'].map((f) => (
           <button
@@ -132,7 +123,6 @@ export default function BookingsPage() {
         ))}
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -148,7 +138,6 @@ export default function BookingsPage() {
         </div>
       )}
 
-      {/* Bookings List */}
       {!loading && (
         <div className="space-y-4">
           {filtered.length > 0 ? (
@@ -174,7 +163,6 @@ export default function BookingsPage() {
         </div>
       )}
 
-      {/* Payment Modal */}
       <Modal
         isOpen={payModalOpen}
         onClose={() => setPayModalOpen(false)}

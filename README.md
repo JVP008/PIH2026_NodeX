@@ -15,7 +15,6 @@ HouseConnect Pro brings transparency, speed, and trust to home services by offer
 - **Smart Discovery** — Browse verified pros by category, rating, location, and availability
 - **Instant Booking** — Post a job, get matched, book and pay — all in one flow
 - **Trust Layer** — Verified profiles, ratings, reviews, and dispute resolution
-- **Pan-India Coverage** — 50+ cities from metros to tier-2 towns
 
 ## Tech Stack
 

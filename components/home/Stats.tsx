@@ -3,13 +3,13 @@
 import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
-// A special helper hook that animates numbers counting up from 0 to their final value.
 function useCountUp(end: number, duration: number = 2000, decimals: number = 0) {
   const [value, setValue] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const startAnimation = useCallback(() => {
+    // Prevent restarting animation every render.
     if (hasStarted || end === 0) return;
     setHasStarted(true);
 
@@ -17,7 +17,7 @@ function useCountUp(end: number, duration: number = 2000, decimals: number = 0) 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
+      // Smooth easing makes number movement feel natural instead of jumpy.
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(parseFloat((eased * end).toFixed(decimals)));
 
@@ -30,9 +30,8 @@ function useCountUp(end: number, duration: number = 2000, decimals: number = 0) 
     requestAnimationFrame(animate);
   }, [end, duration, decimals, hasStarted]);
 
-  // This listens for when the numbers actually appear on the screen (when you scroll down)
-  // so the animation only starts playing when the user can see it.
   useEffect(() => {
+    // Start the counter only when this part of the page is visible on screen.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -49,13 +48,6 @@ function useCountUp(end: number, duration: number = 2000, decimals: number = 0) 
   return { value, ref };
 }
 
-/**
- * Stats Component
- *
- * This displays impressive numbers (like "Verified Pros" and "Jobs Posted")
- * to build trust with the visitor. It queries the database for the real count
- * and adds them to a base number, then animates them on screen.
- */
 const Stats = memo(() => {
   const [stats, setStats] = useState({
     contractors: 1540,
@@ -63,11 +55,11 @@ const Stats = memo(() => {
     rating: 4.8,
     satisfaction: 98,
   });
-  const [loaded, setLoaded] = useState(true); // start true so animation triggers immediately
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // Fetch all required numbers at once for faster loading.
         const [{ count: contractorCount }, { count: jobCount }, { data: contractors }] =
           await Promise.all([
             supabase
@@ -83,30 +75,25 @@ const Stats = memo(() => {
             0
           ) / ((contractors || []).length || 1);
 
+        // Keep a strong baseline so cards still look trustworthy with small datasets.
         setStats({
           contractors: (contractorCount || 0) + 1540,
           jobs: (jobCount || 0) + 8930,
           rating: avgRating ? Math.max(avgRating, 4.8) : 4.8,
           satisfaction: 98,
         });
-        // loaded already true, no need to set again
       } catch {
-        // Already initialized with fallback — nothing to do
+        // Keep default values if live fetch fails.
+        return;
       }
     };
     fetchStats();
   }, []);
 
-  const { value: contractorsCount, ref: contractorsRef } = useCountUp(
-    loaded ? stats.contractors : 0,
-    2000
-  );
-  const { value: satisfactionCount, ref: satisfactionRef } = useCountUp(
-    loaded ? stats.satisfaction : 0,
-    2200
-  );
-  const { value: jobsCount, ref: jobsRef } = useCountUp(loaded ? stats.jobs : 0, 1800);
-  const { value: ratingCount, ref: ratingRef } = useCountUp(loaded ? stats.rating : 0, 2400, 1);
+  const { value: contractorsCount, ref: contractorsRef } = useCountUp(stats.contractors, 2000);
+  const { value: satisfactionCount, ref: satisfactionRef } = useCountUp(stats.satisfaction, 2200);
+  const { value: jobsCount, ref: jobsRef } = useCountUp(stats.jobs, 1800);
+  const { value: ratingCount, ref: ratingRef } = useCountUp(stats.rating, 2400, 1);
 
   return (
     <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-10">

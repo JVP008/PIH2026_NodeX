@@ -8,13 +8,6 @@ import { supabase } from '@/lib/supabaseClient';
 
 const CATEGORIES = ['Plumbing', 'Electrical', 'Cleaning', 'HVAC', 'Painting', 'Landscaping'];
 
-/**
- * PostJobPage Component
- *
- * This is the page where a new professional can sign up to offer their services on HouseConnect.
- * It contains a form that collects their details and adds a new "unverified" contractor profile
- * to our database using Supabase.
- */
 export default function PostJobPage() {
   const router = useRouter();
   const { showToast } = useToast();
@@ -29,19 +22,20 @@ export default function PostJobPage() {
     description: '',
   });
 
-  // This function runs when the user clicks the "List My Services" button.
-  // It checks if the required fields are filled, and then saves the data to the database.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Stop submission early if required fields are missing.
     if (!formData.name || !formData.location || !formData.service) {
       showToast('Please fill in all required fields (Name, Category, Location)', 'error');
       return;
     }
 
+    // Lock the submit button while the profile is being saved.
     setLoading(true);
 
     try {
+      // Create a new contractor profile record in Supabase.
       const { error } = await supabase.from('contractors').insert([
         {
           name: formData.name,
@@ -49,10 +43,10 @@ export default function PostJobPage() {
           location: formData.location,
           price: formData.price ? `₹${formData.price}/hr` : 'Contact for pricing',
           description: formData.description,
-          rating: 5.0, // Initial perfect rating
+          rating: 5.0,
           reviews: 0,
           completed_jobs: 0,
-          verified: false, // Will be verified by admin
+          verified: false,
           available: true,
           response_time: 'Usually within 1 hour',
         },
@@ -61,6 +55,7 @@ export default function PostJobPage() {
       if (error) throw error;
 
       showToast('Your service profile has been posted successfully!');
+      // Short delay lets users see success feedback before redirect.
       setTimeout(() => router.push('/contractors'), 1500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -71,6 +66,7 @@ export default function PostJobPage() {
   };
 
   const handleGenerateDescription = async () => {
+    // AI needs at least service + location to write a useful description.
     if (!formData.service || !formData.location) {
       showToast('Please enter both Service Category and Location first to generate a description.', 'error');
       return;
@@ -78,24 +74,25 @@ export default function PostJobPage() {
 
     setIsGeneratingDesc(true);
     try {
+      // Ask our backend route to generate text using Gemini.
       const res = await fetch('/api/gemini/generate-desc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: formData.name,
           service: formData.service,
-          location: formData.location
-        })
+          location: formData.location,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to generate description');
 
-      setFormData(prev => ({ ...prev, description: data.description }));
+      // Fill the textarea with AI-generated content.
+      setFormData((prev) => ({ ...prev, description: data.description }));
       showToast('✨ Magic description generated successfully!');
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error('AI generation error:', msg);
       showToast(`AI Error: ${msg}`, 'error');
     } finally {
       setIsGeneratingDesc(false);
@@ -183,7 +180,6 @@ export default function PostJobPage() {
                 min="0"
                 value={formData.price}
                 onChange={(e) => {
-                  // PREVENT NEGATIVE NUMBERS OR HYPHENS
                   const val = e.target.value.replace(/[^0-9]/g, '');
                   setFormData({ ...formData, price: val });
                 }}

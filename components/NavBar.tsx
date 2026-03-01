@@ -27,23 +27,22 @@ export default function NavBar() {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Listen for login/logout changes so the navbar updates instantly.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setUserEmail(session?.user?.email ?? null);
     });
 
+    // Also read the current user once when the component mounts.
     supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
 
+    // Clean up listener when this component is removed.
     return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    setMobileOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
+    // Close the mobile menu if the user taps anywhere outside it.
     const handleClickOutside = (e: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
         setMobileOpen(false);
@@ -57,11 +56,13 @@ export default function NavBar() {
   }, [mobileOpen]);
 
   const handleLogout = async () => {
+    // End user session, then send them to login page.
     await supabase.auth.signOut();
     router.push('/login');
   };
 
   const isActive = (path: string) => {
+    // Highlight the current page in the navigation bar.
     if (path === '/' && pathname === '/') return true;
     if (path !== '/' && pathname.startsWith(path)) return true;
     return false;
@@ -142,6 +143,7 @@ export default function NavBar() {
               <Link
                 key={href}
                 href={href}
+                onClick={() => setMobileOpen(false)}
                 className={`px-4 py-3 rounded-lg font-bold text-lg transition-all ${isActive(href) ? 'bg-yellow-200 border-2 border-black shadow-[2px_2px_0px_0px_#000]' : 'hover:bg-gray-50'}`}
               >
                 {label}
@@ -159,7 +161,10 @@ export default function NavBar() {
                   <span className="font-bold text-sm">{userEmail.split('@')[0]}</span>
                 </div>
                 <button
-                  onClick={handleLogout}
+                  onClick={async () => {
+                    setMobileOpen(false);
+                    await handleLogout();
+                  }}
                   className="px-4 py-2 bg-red-200 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000] hover:bg-red-300 transition-colors"
                 >
                   Logout
@@ -168,6 +173,7 @@ export default function NavBar() {
             ) : (
               <Link
                 href="/login"
+                onClick={() => setMobileOpen(false)}
                 className="block text-center py-3 bg-blue-400 text-black border-2 border-black rounded-lg font-black shadow-[3px_3px_0px_0px_#000] hover:translate-y-[-1px] transition-all uppercase"
               >
                 Login / Sign Up
