@@ -1,46 +1,27 @@
-import ContractorList from "@/components/contractors/ContractorList";
-import { supabase } from "@/lib/supabaseClient";
-import { seedContractors } from "@/lib/seedContractors";
-import { Contractor } from "@/types";
+import { supabase } from '@/lib/supabaseClient';
+import ContractorList from '@/components/contractors/ContractorList';
+import { seedContractors } from '@/lib/seedContractors';
 
-export const revalidate = 0; // Ensure fresh data on every visit
+// Caching allowed for better performance
 
 export default async function ContractorsPage() {
-  // Fetch all contractors from Supabase
-  const { data: dbContractors, error } = await supabase
-    .from("contractors")
-    .select("*")
-    .order("rating", { ascending: false });
-
-  // Merge database contractors with seed contractors,
-  // preferring database records if IDs overlap.
-  const allContractors: Contractor[] = [...(dbContractors || [])];
-
-  // Add seed contractors that aren't already in the database list
-  seedContractors.forEach((seed) => {
-    if (!allContractors.some((db) => db.id === seed.id)) {
-      allContractors.push(seed);
+    // Try to fetch from Supabase; fall back to seed data if it fails or returns nothing
+    let contractors = seedContractors;
+    try {
+        const { data } = await supabase.from('contractors').select('*');
+        if (data && data.length > 0) {
+            // Merge: add any Supabase records that aren't already in seed data
+            const seedIds = new Set(seedContractors.map(c => c.id));
+            const extraFromDb = data.filter(c => !seedIds.has(c.id));
+            contractors = [...seedContractors, ...extraFromDb];
+        }
+    } catch {
+        // Supabase unavailable — seed data already set above
     }
-  });
 
-  // Sort by rating descending
-  allContractors.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-
-  return (
-    <main className="min-h-screen bg-[#fdfbf8] pt-20">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-12 text-center">
-          <h1 className="text-5xl font-black uppercase tracking-tight mb-4">
-            Find Your Pro
-          </h1>
-          <p className="text-xl font-bold text-gray-700">
-            Trusted local experts, verified and ready to work.
-          </p>
+    return (
+        <div className="max-w-7xl mx-auto px-4 py-12">
+            <ContractorList initialContractors={contractors} />
         </div>
-
-        {/* Interactive Client Component for filtering & searching */}
-        <ContractorList initialContractors={allContractors} />
-      </div>
-    </main>
-  );
+    );
 }
