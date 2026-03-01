@@ -19,8 +19,10 @@ export async function GET() {
     if (fetchError) throw fetchError;
 
     return NextResponse.json({ data });
-  } catch {
+  } catch (error) {
     // Return a clear server error message when fetch fails.
+    // eslint-disable-next-line no-console
+    console.error('Error fetching bookings:', error);
     return NextResponse.json({ error: 'Error fetching bookings' }, { status: 500 });
   }
 }
@@ -118,8 +120,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ data });
-  } catch {
+  } catch (error) {
     // Send a predictable error shape for frontend handling.
+    // eslint-disable-next-line no-console
+    console.error('Error creating booking:', error);
     return NextResponse.json({ error: 'Error creating booking' }, { status: 500 });
   }
 }

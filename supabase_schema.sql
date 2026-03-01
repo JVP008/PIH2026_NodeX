@@ -24,6 +24,7 @@ CREATE TABLE contractors (
   response_time TEXT,
   completed_jobs INTEGER DEFAULT 0,
   description TEXT,
+  mobile TEXT UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -33,9 +34,12 @@ CREATE TABLE jobs (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   title TEXT,
   category TEXT NOT NULL,
+  service TEXT DEFAULT 'General',
   description TEXT NOT NULL,
   location TEXT NOT NULL,
   urgency TEXT NOT NULL,
+  status TEXT DEFAULT 'open',
+  budget TEXT,
   budget_min INTEGER,
   budget_max INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

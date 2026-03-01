@@ -21,8 +21,10 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch {
+  } catch (error) {
     // Return a stable error payload for frontend error toasts.
+    // eslint-disable-next-line no-console
+    console.error('Error fetching contractors:', error);
     return NextResponse.json({ error: 'Error fetching contractors' }, { status: 500 });
   }
 }

@@ -66,23 +66,13 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchContractors = useCallback(async () => {
-    // Reload contractors from database (used when initial list is empty or retry is clicked).
+    // Reload contractors from database.
     setLoading(true);
     setError(null);
     try {
       const { data, error: fetchError } = await supabase.from('contractors').select('*');
       if (fetchError) throw fetchError;
-
-      const uniqueNames = new Set();
-      const deduplicated = [];
-      for (const req of data || []) {
-        const nameKey = (req.name || '').toLowerCase().trim();
-        if (!uniqueNames.has(nameKey)) {
-          uniqueNames.add(nameKey);
-          deduplicated.push(req);
-        }
-      }
-      setContractors(deduplicated);
+      setContractors(data || []);
     } catch {
       setError('Failed to load contractors. Please try again.');
       showToast('Error loading contractors', 'error');
@@ -162,7 +152,8 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
           date: bookingDate,
           time: bookingTime,
           status: 'upcoming',
-          price: Number.parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, ''), 10) || 500,
+          price:
+            Number.parseInt((selectedContractor.price || '0').replace(/[^0-9]/g, ''), 10) || 500,
           user_id: user?.id || null,
         }),
       });

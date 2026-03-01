@@ -75,7 +75,9 @@ export default function AIChatbot() {
             {messages.length === 0 && (
               <div className="text-center text-gray-500 font-medium mt-10 px-2">
                 <p className="mb-2">👋 Hi! I know everything about this app.</p>
-                <p className="text-xs">Ask me about our contractors, services, bookings, or how to use HouseConnect Pro.</p>
+                <p className="text-xs">
+                  Ask me about our contractors, services, bookings, or how to use HouseConnect Pro.
+                </p>
               </div>
             )}
 

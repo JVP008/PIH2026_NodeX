@@ -76,7 +76,12 @@ export default function BookingCard({
           {booking.status === 'completed' && (
             <>
               <button
-                onClick={() => onReview?.({ id: booking.id, contractor: { name: booking.contractor?.name || 'Contractor' } })}
+                onClick={() =>
+                  onReview?.({
+                    id: booking.id,
+                    contractor: { name: booking.contractor?.name || 'Contractor' },
+                  })
+                }
                 className="px-3 py-1 bg-yellow-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_#000]"
               >
                 Rate & Review

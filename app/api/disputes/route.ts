@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { isNonEmptyString } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0;
 
 const allowedDisputeTypes = new Set(['refund', 'quality', 'noshow', 'payment', 'other']);
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,20 +12,19 @@ export async function GET() {
     // Fetch disputes with related booking and contractor context for support view.
     const { data, error } = await supabase
       .from('disputes')
-      .select('*, booking:bookings(service, contractor:contractors(name))');
+      .select('*, booking:bookings(time, date, contractor:contractors(name, service))');
 
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch {
-    // Standard error response keeps frontend handling simple.
+  } catch (error) {
+    console.error('Error fetching disputes:', error);
     return NextResponse.json({ error: 'Error fetching disputes' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    // Parse dispute details from incoming request body.
     const body = await request.json();
 
     if (!body || typeof body !== 'object') {
@@ -63,8 +60,10 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({ data });
-  } catch {
+  } catch (error) {
     // Return clear failure message if database insert fails.
+    // eslint-disable-next-line no-console
+    console.error('Error creating dispute:', error);
     return NextResponse.json({ error: 'Error creating dispute' }, { status: 500 });
   }
 }
