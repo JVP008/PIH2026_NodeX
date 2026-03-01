@@ -129,7 +129,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ data });
-  } catch {
+  } catch (err: any) {
+    console.error('SERVER ERROR IN POST /api/bookings:', err);
     return NextResponse.json({ error: 'Error creating booking' }, { status: 500 });
   }
 }

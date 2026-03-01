@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-/**
+/*
  * Footer Component
  *
  * This block appears at the very bottom of the website on every page.
@@ -209,6 +209,20 @@ export default function Footer() {
                 <span>support@houseconnect.in</span>
               </li>
             </ul>
+          </div>
+        </div>
+
+        <div className="bg-yellow-50 border-3 border-black p-4 rounded-xl mb-8 flex items-start gap-4 shadow-[4px_4px_0px_0px_#000]">
+          <div className="bg-yellow-300 w-10 h-10 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0">
+            <i className="fas fa-info-circle text-black text-xl"></i>
+          </div>
+          <div className="text-left">
+            <h5 className="font-black uppercase text-sm mb-1 tracking-wider">Please Note:</h5>
+            <p className="text-black font-semibold text-sm leading-relaxed">
+              This application is running on a <strong>Supabase Free Tier</strong>. Making too many
+              rapid requests or bookings in a short period may cause temporary error messages or
+              connection timeouts. If this happens, please wait a minute and try again.
+            </p>
           </div>
         </div>
 
