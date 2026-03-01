@@ -31,6 +31,33 @@ export default function BookingsPage() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
 
+  const refreshContractorAvailability = useCallback(async (contractorId: number | null) => {
+    if (!contractorId) return;
+
+    // Contractor is available only if there are no upcoming/pending bookings for them.
+    const { data: activeBookings, error: activeBookingsError } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('contractor_id', contractorId)
+      .in('status', ['upcoming', 'pending'])
+      .limit(1);
+
+    if (activeBookingsError) {
+      throw activeBookingsError;
+    }
+
+    const shouldBeAvailable = !activeBookings || activeBookings.length === 0;
+
+    const { error: availabilityUpdateError } = await supabase
+      .from('contractors')
+      .update({ available: shouldBeAvailable })
+      .eq('id', contractorId);
+
+    if (availabilityUpdateError) {
+      throw availabilityUpdateError;
+    }
+  }, []);
+
   // Get the latest booking list from the database so the page stays up to date.
   const fetchBookings = useCallback(async () => {
     // Show loading placeholders while data is being requested.
@@ -38,18 +65,22 @@ export default function BookingsPage() {
     try {
       // Read signed-in user so bookings can be filtered by that account.
       const user = (await supabase.auth.getUser()).data.user;
-      if (!user) {
-        setBookings([]);
-        setLoading(false);
-        return;
-      }
 
-      // Ask Supabase for bookings and include contractor details in the same request.
-      const { data, error } = await supabase
+      // Show both user-specific and guest bookings (user_id is null) for a better demo experience.
+      let query = supabase
         .from('bookings')
         .select('*, contractor:contractors(name, image, service)')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
+
+      if (user) {
+        // Show bookings for this user OR guest bookings
+        query = query.or(`user_id.eq.${user.id},user_id.is.null`);
+      } else {
+        // Show only guest bookings if not logged in
+        query = query.is('user_id', null);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         throw error;
@@ -78,6 +109,15 @@ export default function BookingsPage() {
       showToast('Failed to cancel booking', 'error');
       return;
     }
+
+    const cancelledBooking = bookings.find((booking) => booking.id === id);
+
+    try {
+      await refreshContractorAvailability(cancelledBooking?.contractor_id ?? null);
+    } catch {
+      // Keep user flow smooth even if availability refresh fails.
+    }
+
     showToast('Booking cancelled successfully');
     fetchBookings();
   };
@@ -130,6 +170,19 @@ export default function BookingsPage() {
     if (error) {
       showToast('Payment failed', 'error');
       return;
+    }
+
+    try {
+      // 1. Refresh availability based on current upcoming/pending slots
+      await refreshContractorAvailability(selectedBooking.contractor_id);
+
+      // 2. Increment the completed_jobs count for the professional
+      if (selectedBooking.contractor_id) {
+        await supabase.rpc('increment_completed_jobs', { row_id: selectedBooking.contractor_id });
+      }
+    } catch (err) {
+      console.error('Post-payment update error:', err);
+      // Keep payment success flow uninterrupted even if secondary updates fail.
     }
 
     setPayModalOpen(false);

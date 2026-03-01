@@ -146,6 +146,11 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
 
     setIsSubmitting(true);
     try {
+      const contractorId = Number.parseInt(selectedContractor.id, 10);
+      if (!Number.isInteger(contractorId) || contractorId <= 0) {
+        throw new Error('Invalid contractor selected.');
+      }
+
       // Read signed-in user so booking can be linked to that account.
       const user = (await supabase.auth.getUser()).data.user;
 
@@ -153,7 +158,7 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
       const { data: existingBookings } = await supabase
         .from('bookings')
         .select('id')
-        .eq('contractor_id', parseInt(selectedContractor.id) || null)
+        .eq('contractor_id', contractorId)
         .eq('date', bookingDate)
         .eq('time', bookingTime);
 
@@ -166,7 +171,7 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
       // Save booking into database.
       const { error: bookingError } = await supabase.from('bookings').insert([
         {
-          contractor_id: parseInt(selectedContractor.id) || null,
+          contractor_id: contractorId,
           date: bookingDate,
           time: bookingTime,
           status: 'upcoming',
@@ -178,6 +183,23 @@ function ContractorListContent({ initialContractors }: { initialContractors: Con
       if (bookingError) {
         throw bookingError;
       }
+
+      // Mark this contractor as busy once a booking is confirmed.
+      const { error: availabilityError } = await supabase
+        .from('contractors')
+        .update({ available: false })
+        .eq('id', contractorId);
+
+      if (availabilityError) {
+        throw availabilityError;
+      }
+
+      // Update list state immediately so the badge/button reflect latest availability.
+      setContractors((prev) =>
+        prev.map((contractor) =>
+          Number(contractor.id) === contractorId ? { ...contractor, available: false } : contractor
+        )
+      );
 
       showToast(`Booking confirmed! Redirecting to your bookings...`);
 
